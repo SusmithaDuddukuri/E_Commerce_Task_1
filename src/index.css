@@ -1,0 +1,372 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans overflow-x-hidden antialiased transition-colors duration-200;
+    background-color: #f8fafc;
+    color: #0f172a;
+  }
+
+  html.dark body {
+    background-color: #0b0b0f;
+    color: #e2e8f0;
+  }
+
+  button, input, select {
+    font: inherit;
+  }
+
+  ::selection {
+    background: rgba(99, 102, 241, 0.45);
+    color: white;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+html.dark ::-webkit-scrollbar-track {
+  background: #0f0f14;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: #2a2a36;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3f3f50;
+}
+
+/* App shell */
+.app-shell {
+  min-height: 100vh;
+  background: #f8fafc;
+  position: relative;
+}
+html.dark .app-shell {
+  background: radial-gradient(ellipse at 50% 0%, rgba(99, 102, 241, 0.08), transparent 40%), #0b0b0f;
+}
+
+.ambient-noise {
+  display: none;
+}
+
+/* Cards & panels – cleaner, less glassy */
+.glass-panel {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+html.dark .glass-panel {
+  background: rgba(18, 18, 24, 0.92);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+  backdrop-filter: blur(12px);
+}
+
+.glass-pill {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+}
+html.dark .glass-pill {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+html.dark .glass-card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.gradient-text {
+  color: #4f46e5;
+}
+html.dark .gradient-text {
+  background: linear-gradient(135deg, #fff 0%, #c4b5fd 50%, #67e8f9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Buttons */
+.primary-cta {
+  @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 active:scale-[0.98] transition-all;
+}
+html.dark .primary-cta {
+  @apply bg-white text-slate-900 hover:bg-slate-100;
+}
+
+.secondary-cta {
+  @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 active:scale-[0.98] transition-all;
+}
+html.dark .secondary-cta {
+  @apply border-slate-700 bg-transparent text-slate-200 hover:bg-slate-800/50;
+}
+
+/* Hero */
+.hero-grid {
+  opacity: 0.12;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+html.dark .hero-grid {
+  opacity: 0.18;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  display: inline-block;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.stat-chip {
+  @apply rounded-xl border border-slate-200 bg-white px-4 py-3;
+}
+html.dark .stat-chip {
+  @apply border-white/10 bg-white/[.025];
+}
+.stat-chip strong {
+  @apply block text-sm font-bold text-slate-900;
+}
+html.dark .stat-chip strong {
+  @apply text-white;
+}
+.stat-chip span {
+  @apply block text-[10px] text-slate-500 mt-0.5;
+}
+
+.spotlight-card {
+  @apply relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm;
+  min-height: 460px;
+}
+html.dark .spotlight-card {
+  @apply border-white/10 bg-slate-950 shadow-2xl shadow-indigo-950/20;
+}
+
+.spotlight-image {
+  @apply w-full h-full object-cover;
+  position: absolute;
+  inset: 0;
+  transition: transform 0.8s ease;
+}
+
+.spotlight-card:hover .spotlight-image {
+  transform: scale(1.03);
+}
+
+.micro-badge {
+  @apply px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide text-slate-700 bg-white/90 border border-slate-200;
+}
+html.dark .micro-badge {
+  @apply text-white bg-black/50 border-white/10;
+}
+
+.micro-badge-live {
+  @apply flex items-center gap-1.5 text-emerald-600;
+}
+html.dark .micro-badge-live {
+  @apply text-emerald-300;
+}
+
+.floating-offer {
+  @apply absolute -bottom-4 left-3 sm:left-5 flex items-center gap-3 px-4 py-3 rounded-xl bg-white border border-slate-200 shadow-lg;
+}
+html.dark .floating-offer {
+  @apply bg-slate-900/95 border-white/10 shadow-2xl;
+}
+
+/* Quick panel */
+.quick-panel {
+  @apply grid sm:grid-cols-[1fr_auto_auto] items-center gap-4 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm;
+}
+html.dark .quick-panel {
+  @apply border-indigo-400/15 bg-indigo-950/30 shadow-2xl shadow-indigo-950/20;
+  backdrop-filter: blur(12px);
+}
+
+.icon-orb {
+  @apply w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600;
+}
+html.dark .icon-orb {
+  @apply bg-indigo-500/15 border-indigo-400/20 text-indigo-300;
+}
+
+/* Section headings */
+.section-heading {
+  @apply flex items-end justify-between gap-4 mb-6;
+}
+.section-heading h2 {
+  @apply text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 mt-1;
+}
+html.dark .section-heading h2 {
+  @apply text-white;
+}
+
+.eyebrow {
+  @apply text-[11px] uppercase tracking-wider font-semibold text-indigo-600;
+}
+html.dark .eyebrow {
+  @apply text-indigo-300;
+}
+
+/* Category tiles */
+.category-tile {
+  @apply min-h-[100px] rounded-2xl border border-slate-200 bg-white p-4 flex items-center gap-3 hover:border-slate-300 hover:shadow-sm transition-all duration-200;
+}
+html.dark .category-tile {
+  @apply border-white/10 bg-white/[.025] hover:border-indigo-400/30 hover:bg-indigo-500/[.06];
+}
+
+.category-icon {
+  @apply w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-indigo-600;
+}
+html.dark .category-icon {
+  @apply bg-slate-900 border-white/10 text-indigo-300;
+}
+
+.category-count {
+  @apply text-[10px] font-mono text-slate-500 rounded-full border border-slate-200 px-2 py-1;
+}
+html.dark .category-count {
+  @apply text-slate-600 border-white/10;
+}
+
+/* Feature strip */
+.feature-strip {
+  @apply rounded-2xl border border-amber-200 bg-amber-50/50 p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-5;
+}
+html.dark .feature-strip {
+  @apply border-amber-400/15 bg-gradient-to-r from-amber-500/[.08] via-white/[.025] to-indigo-500/[.08];
+}
+.feature-strip h3 {
+  @apply text-xl sm:text-2xl font-bold text-slate-900 mt-1;
+}
+html.dark .feature-strip h3 {
+  @apply text-white;
+}
+.feature-strip p {
+  @apply text-sm text-slate-600 mt-2;
+}
+html.dark .feature-strip p {
+  @apply text-xs text-slate-400;
+}
+
+.feature-pill {
+  @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-slate-200 text-[11px] text-slate-600;
+}
+html.dark .feature-pill {
+  @apply bg-black/20 border-white/10 text-[10px] text-slate-300;
+}
+
+/* Mini products */
+.mini-product {
+  @apply rounded-2xl p-2 border border-slate-200 bg-white hover:shadow-md transition-all duration-200;
+}
+html.dark .mini-product {
+  @apply border-white/10 bg-white/[.02] hover:bg-white/[.04] hover:border-indigo-400/20;
+}
+.mini-product img {
+  @apply w-full aspect-[1.15] object-cover rounded-xl transition-transform duration-500;
+}
+.mini-product:hover img {
+  transform: scale(1.03);
+}
+.mini-rank {
+  @apply absolute top-3 left-3 px-2 py-1 rounded-md bg-white/90 text-[10px] font-bold text-slate-800 border border-slate-200;
+}
+html.dark .mini-rank {
+  @apply bg-black/60 text-white border-white/10;
+}
+.mini-view {
+  @apply absolute bottom-3 right-3 px-2 py-1 rounded-md bg-slate-900 text-white text-[10px] font-medium opacity-0 translate-y-1 transition-all duration-200;
+}
+html.dark .mini-view {
+  @apply bg-white text-slate-950;
+}
+.mini-product:hover .mini-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Trust */
+.trust-grid {
+  @apply grid sm:grid-cols-2 xl:grid-cols-4 gap-3;
+}
+.trust-card {
+  @apply rounded-2xl border border-slate-200 bg-white p-5 flex gap-3 hover:shadow-sm transition-shadow;
+}
+html.dark .trust-card {
+  @apply border-white/10 bg-white/[.02] hover:bg-white/[.035];
+}
+.trust-card h4 {
+  @apply text-sm font-semibold text-slate-900;
+}
+html.dark .trust-card h4 {
+  @apply text-white;
+}
+.trust-card p {
+  @apply text-[12px] text-slate-500 leading-5 mt-1;
+}
+
+/* Footer */
+.footer-aura {
+  @apply border-t border-slate-200 bg-white;
+}
+html.dark .footer-aura {
+  @apply border-white/10 bg-black/20;
+}
+
+.product-card-glow {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+html.dark .product-card-glow {
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+}
+
+/* Product card base for light mode */
+.product-card {
+  @apply rounded-2xl border border-slate-200 bg-white overflow-hidden transition-shadow hover:shadow-md;
+}
+html.dark .product-card {
+  @apply border-white/10 bg-slate-900/50 hover:border-indigo-400/20;
+}
+
+@media (max-width: 640px) {
+  .spotlight-card {
+    min-height: 380px;
+  }
+  .floating-offer {
+    position: relative;
+    left: 8px;
+    bottom: 12px;
+    width: max-content;
+  }
+}
