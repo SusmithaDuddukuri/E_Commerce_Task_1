@@ -210,7 +210,7 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onCompleteOr
             <div className="space-y-3">
               <label className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-sm">
                 <input type="radio" checked={paymentId === 'cod'} onChange={() => setPaymentId('cod')} />
-                Pay on delivery / demo pay
+                Cash on delivery
               </label>
               {payments.map((p) => (
                 <label key={p.id} className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-sm">
@@ -246,7 +246,7 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onCompleteOr
                 <span>Total</span><span>${total.toFixed(2)}</span>
               </div>
               <p className="text-xs text-slate-500 pt-2">
-                {cartItems.length} item(s) · {shippingMethod} · {paymentId === 'cod' ? 'Demo pay' : 'Card on file'}
+                {cartItems.length} item(s) · {shippingMethod} · {paymentId === 'cod' ? 'Cash on delivery' : 'Saved card'}
               </p>
             </div>
           )}

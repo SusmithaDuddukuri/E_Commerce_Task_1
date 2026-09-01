@@ -206,14 +206,14 @@ export default function MerchantDashboard({ onTriggerToast }) {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-bold text-white">Live Transaction Stream</h3>
-            <p className="text-[11px] text-slate-400">Incoming simulated orders stream</p>
+            <p className="text-[11px] text-slate-400">Live order operations</p>
           </div>
           <button
             onClick={handleSimulateLiveOrder}
             className="px-3 py-1.5 rounded-full bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 text-xs font-semibold flex items-center space-x-1.5 hover:bg-indigo-600 hover:text-white transition-all"
           >
             <RefreshCw className="w-3.5 h-3.5" />
-            <span>Simulate Order Stream</span>
+            <span>Refresh Order Feed</span>
           </button>
         </div>
 

@@ -13,6 +13,7 @@ import OrderHistory from './components/OrderHistory';
 import SearchSuggestions from './components/SearchSuggestions';
 import AuthModal from './components/AuthModal';
 import AccountPortal from './components/AccountPortal';
+import RoleDashboard from './components/RoleDashboard';
 import { INITIAL_PRODUCTS, CATEGORIES, searchProducts, filterProducts, sortProducts } from './data/productsData';
 import { loadCart, saveCart, loadWishlist, saveWishlist, loadPrefs, savePrefs, loadOrders, saveOrders, saveRecentSearch, loadRecentSearches, loadUser, saveUser, loadRecentViewed, saveRecentViewed } from './utils/storage';
 import { orderId } from './utils/formatters';
@@ -302,6 +303,8 @@ export default function App() {
         user={user}
         onOpenAccount={() => setIsAccountOpen(true)}
         onOpenAuth={() => setIsAuthOpen(true)}
+        onNewArrivals={() => { setSortBy('newest'); setCurrentView('storefront'); setTimeout(scrollToCatalog, 50); }}
+        onLogout={() => { saveUser(null); setUser(null); setCurrentView('storefront'); setIsAccountOpen(false); addToast('Signed out', 'See you next time.'); }}
       />
 
       {showSuggestions && (
@@ -451,6 +454,8 @@ export default function App() {
                 compareIds={compareIds}
                 onToggleCompare={toggleCompare}
                 totalCatalog={products.length}
+                searchQuery={searchQuery}
+                onSearchChange={(q) => setSearchQuery(q)}
               />
             </div>
 
@@ -521,8 +526,20 @@ export default function App() {
               </div>
             </section>
           </>
+        ) : currentView === 'about' ? (
+          <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+            <div className="glass-panel rounded-2xl p-8 md:p-12">
+              <p className="eyebrow">About AURA</p>
+              <h1 className="text-4xl font-bold text-slate-900 dark:text-white mt-2">A modern commerce experience built around clarity.</h1>
+              <p className="text-slate-600 dark:text-slate-300 mt-5 max-w-3xl leading-7">AURA brings products, orders, customer accounts and merchant operations into one clean commerce platform. Browse the catalog, save products, place orders and manage your account from one place.</p>
+              <div className="grid md:grid-cols-3 gap-4 mt-10">
+                {[['Customer first','Simple discovery, transparent order status and account tools.'],['Reliable operations','Inventory, fulfillment and support workflows are organized by role.'],['Secure by design','Each workspace exposes only the actions relevant to the signed-in role.']].map(([t,d])=><div className="glass-card rounded-xl p-5" key={t}><h3 className="font-semibold text-slate-900 dark:text-white">{t}</h3><p className="text-sm text-slate-500 mt-2 leading-6">{d}</p></div>)}
+              </div>
+              <button className="primary-cta mt-8" onClick={() => { setCurrentView('storefront'); setTimeout(scrollToCatalog,50); }}>Start shopping <ArrowRight className="w-4 h-4"/></button>
+            </div>
+          </section>
         ) : (
-          <MerchantDashboard onTriggerToast={addToast} />
+          user?.role === 'merchant' ? <MerchantDashboard onTriggerToast={addToast} /> : <RoleDashboard user={user || {name:'Guest',email:'',role:'customer'}} orders={orders} wishlistCount={wishlistItems.length} onStore={() => setCurrentView('storefront')} onLogout={() => { saveUser(null); setUser(null); setCurrentView('storefront'); addToast('Signed out','See you next time.'); }} onToast={addToast} />
         )}
       </main>
 
@@ -573,7 +590,8 @@ export default function App() {
         onClose={() => setIsAuthOpen(false)}
         onAuth={(session) => {
           setUser(session);
-          addToast('Welcome', session.name || session.email);
+          setCurrentView(session.role && session.role !== 'customer' ? 'dashboard' : 'storefront');
+          addToast('Welcome', `${session.name || session.email} · ${session.role || 'customer'}`);
         }}
       />
       <AccountPortal
@@ -601,9 +619,9 @@ export default function App() {
             <p className="font-semibold tracking-wide text-slate-900 dark:text-white">
               AURA <span className="text-indigo-600 dark:text-indigo-300">Shop</span>
             </p>
-            <p className="text-[11px] text-slate-500 mt-0.5">Demo storefront · 2026</p>
+            <p className="text-[11px] text-slate-500 mt-0.5">AURA Commerce · 2026</p>
           </div>
-          <p className="text-[11px] text-slate-500">No real payments · data stays in your browser</p>
+          <p className="text-[11px] text-slate-500">AURA Commerce · Customer and business services</p>
           <div className="flex gap-4 text-[11px] text-slate-500">
             <button
               type="button"
@@ -614,7 +632,7 @@ export default function App() {
             </button>
             <button
               type="button"
-              onClick={() => addToast('Sandbox', 'Checkout is simulated for this demo.', 'info')}
+              onClick={() => setCurrentView('about')}
               className="hover:text-slate-800 dark:hover:text-slate-300"
             >
               About

@@ -18,7 +18,9 @@ export default function ProductGrid({
   setPriceRange,
   compareIds = [],
   onToggleCompare,
-  totalCatalog = 0
+  totalCatalog = 0,
+  searchQuery = '',
+  onSearchChange
 }) {
   if (products.length === 0) {
     return (
@@ -33,6 +35,7 @@ export default function ProductGrid({
     <section className="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
       
       {/* Sorting & Filter Controls Header */}
+      <div className="mb-4"><input id="catalog-search" type="search" placeholder="Search products..." aria-label="Search products" className="w-full max-w-md px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm outline-none" onChange={(e)=>onSearchChange?.(e.target.value)}/></div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800/80">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">All products</h2>
@@ -89,7 +92,7 @@ export default function ProductGrid({
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
+                  className="w-full h-full object-contain p-5 group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
                   loading="lazy"
                 />
 

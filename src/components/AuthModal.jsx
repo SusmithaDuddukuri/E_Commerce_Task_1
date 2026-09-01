@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
 import { loadUsersDb, saveUsersDb, saveUser } from '../utils/storage';
 
+const ROLE_ACCOUNTS = {
+  customer: { email:'customer@aura.com', password:'customer123', name:'AURA Customer' },
+  admin: { email:'admin@aura.com', password:'admin123', name:'AURA Administrator' },
+  worker: { email:'worker@aura.com', password:'worker123', name:'AURA Worker' },
+  support: { email:'support@aura.com', password:'support123', name:'AURA Support' },
+  merchant: { email:'merchant@aura.com', password:'merchant123', name:'AURA Merchant' },
+  manager: { email:'manager@aura.com', password:'manager123', name:'AURA Manager' }
+};
+
 export default function AuthModal({ open, onClose, onAuth, mode: initialMode = 'login' }) {
   const [mode, setMode] = useState(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [role, setRole] = useState('customer');
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
 
@@ -49,10 +59,11 @@ export default function AuthModal({ open, onClose, onAuth, mode: initialMode = '
         password,
         createdAt: new Date().toISOString(),
         loyaltyPoints: 100,
-        loyaltyTier: 'Bronze'
+        loyaltyTier: 'Bronze',
+        role
       };
       saveUsersDb([user, ...db]);
-      const session = { id: user.id, email: user.email, name: user.name, loyaltyPoints: user.loyaltyPoints, loyaltyTier: user.loyaltyTier };
+      const session = { id: user.id, email: user.email, name: user.name, loyaltyPoints: user.loyaltyPoints, loyaltyTier: user.loyaltyTier, role: user.role };
       saveUser(session);
       onAuth?.(session);
       onClose?.();
@@ -60,23 +71,15 @@ export default function AuthModal({ open, onClose, onAuth, mode: initialMode = '
     }
 
     if (mode === 'login') {
+      const presetRole = Object.keys(ROLE_ACCOUNTS).find((r) => ROLE_ACCOUNTS[r].email === em && ROLE_ACCOUNTS[r].password === password);
+      if (presetRole) {
+        const account = ROLE_ACCOUNTS[presetRole];
+        const session = { id:`preset_${presetRole}`, email:account.email, name:account.name, loyaltyPoints:250, loyaltyTier:'Silver', role:presetRole };
+        saveUser(session); onAuth?.(session); onClose?.(); return;
+      }
       const found = db.find((u) => u.email === em && u.password === password);
       if (!found) {
-        // Allow demo login without prior signup
-        if (em === 'demo@aura.com' && password === 'demo') {
-          const session = {
-            id: 'user_demo',
-            email: em,
-            name: 'Demo Shopper',
-            loyaltyPoints: 1250,
-            loyaltyTier: 'Silver'
-          };
-          saveUser(session);
-          onAuth?.(session);
-          onClose?.();
-          return;
-        }
-        setError('Invalid email or password. Try demo@aura.com / demo');
+        setError('Invalid email or password. Use a valid account or one of the role accounts below.');
         return;
       }
       const session = {
@@ -84,7 +87,8 @@ export default function AuthModal({ open, onClose, onAuth, mode: initialMode = '
         email: found.email,
         name: found.name,
         loyaltyPoints: found.loyaltyPoints || 0,
-        loyaltyTier: found.loyaltyTier || 'Bronze'
+        loyaltyTier: found.loyaltyTier || 'Bronze',
+        role: found.role || role || 'customer'
       };
       saveUser(session);
       onAuth?.(session);
@@ -93,7 +97,7 @@ export default function AuthModal({ open, onClose, onAuth, mode: initialMode = '
     }
 
     if (mode === 'forgot') {
-      setInfo('If an account exists, a reset link would be sent. (Demo: use signup or demo@aura.com / demo)');
+      setInfo('If an account exists, password reset instructions will be sent to the registered email address.');
     }
   };
 
@@ -121,6 +125,19 @@ export default function AuthModal({ open, onClose, onAuth, mode: initialMode = '
                 onChange={(e) => setName(e.target.value)}
                 autoComplete="name"
               />
+            </label>
+          )}
+          {mode !== 'forgot' && (
+            <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
+              Account type
+              <select value={role} onChange={(e) => setRole(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-950 px-3 py-2 text-sm">
+                <option value="customer">Customer</option>
+                <option value="admin">Administrator</option>
+                <option value="worker">Worker</option>
+                <option value="support">Support</option>
+                <option value="merchant">Merchant</option>
+                <option value="manager">Manager</option>
+              </select>
             </label>
           )}
           <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
@@ -174,7 +191,15 @@ export default function AuthModal({ open, onClose, onAuth, mode: initialMode = '
               </button>
             )}
           </div>
-          <p className="text-[11px] text-slate-400 pt-1">Demo: demo@aura.com / demo</p>
+          {mode === 'login' && (
+            <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3 mt-2">
+              <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-2">Role accounts</p>
+              <div className="grid grid-cols-2 gap-2">
+                {Object.entries(ROLE_ACCOUNTS).map(([r,a]) => <button key={r} type="button" onClick={() => { setRole(r); setEmail(a.email); setPassword(a.password); }} className="text-left px-2.5 py-2 rounded-md bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 text-[11px] text-slate-600 dark:text-slate-300"><b className="block capitalize">{r}</b><span>{a.email}</span></button>)}
+              </div>
+            </div>
+          )}
+          <p className="text-[11px] text-slate-400 pt-1">Each role has its own workspace and permissions.</p>
         </form>
       </div>
     </div>
