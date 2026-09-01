@@ -16,7 +16,10 @@ export default function Navbar({
   isDarkMode,
   setIsDarkMode,
   onOpenOrders,
-  ordersCount = 0
+  ordersCount = 0,
+  user = null,
+  onOpenAccount,
+  onOpenAuth
 }) {
   const goStorefront = () => {
     setCurrentView('storefront');
@@ -124,6 +127,15 @@ export default function Navbar({
               </button>
             </>
           )}
+
+          <button
+            type="button"
+            onClick={() => (user ? onOpenAccount?.() : onOpenAuth?.())}
+            className="px-2.5 py-1.5 rounded-md text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-colors"
+            title={user ? 'My account' : 'Sign in'}
+          >
+            {user ? (user.name?.split(' ')[0] || 'Account') : 'Sign in'}
+          </button>
 
           <button
             type="button"

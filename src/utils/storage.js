@@ -1,6 +1,5 @@
 /**
- * LocalStorage persistence helpers for Aura Commerce
- * Handles cart, wishlist, orders, preferences with safe fallbacks
+ * LocalStorage persistence for Aura Commerce
  */
 
 const KEYS = {
@@ -10,7 +9,16 @@ const KEYS = {
   PREFS: 'aura_prefs_v2',
   RECENT_SEARCHES: 'aura_recent_searches_v2',
   COMPARE: 'aura_compare_v2',
-  USER: 'aura_user_v2'
+  USER: 'aura_user_v2',
+  USERS: 'aura_users_db_v1',
+  ADDRESSES: 'aura_addresses_v1',
+  PAYMENTS: 'aura_payments_v1',
+  RECENT_VIEWED: 'aura_recent_viewed_v1',
+  REVIEWS: 'aura_reviews_v1',
+  RETURNS: 'aura_returns_v1',
+  TICKETS: 'aura_tickets_v1',
+  COUPONS: 'aura_coupons_v1',
+  ALERTS: 'aura_alerts_v1'
 };
 
 function safeParse(raw, fallback) {
@@ -22,95 +30,92 @@ function safeParse(raw, fallback) {
   }
 }
 
-export function loadCart() {
-  return safeParse(localStorage.getItem(KEYS.CART), []);
+function load(key, fallback) {
+  return safeParse(localStorage.getItem(key), fallback);
 }
 
-export function saveCart(items) {
+function save(key, value) {
   try {
-    localStorage.setItem(KEYS.CART, JSON.stringify(items));
+    localStorage.setItem(key, JSON.stringify(value));
   } catch (e) {
-    console.warn('Cart persistence failed', e);
+    console.warn('Storage failed', key, e);
   }
 }
 
-export function loadWishlist() {
-  return safeParse(localStorage.getItem(KEYS.WISHLIST), []);
-}
+export function loadCart() { return load(KEYS.CART, []); }
+export function saveCart(items) { save(KEYS.CART, items); }
 
-export function saveWishlist(items) {
-  try {
-    localStorage.setItem(KEYS.WISHLIST, JSON.stringify(items));
-  } catch (e) {
-    console.warn('Wishlist persistence failed', e);
-  }
-}
+export function loadWishlist() { return load(KEYS.WISHLIST, []); }
+export function saveWishlist(items) { save(KEYS.WISHLIST, items); }
 
-export function loadOrders() {
-  return safeParse(localStorage.getItem(KEYS.ORDERS), []);
-}
-
-export function saveOrders(orders) {
-  try {
-    localStorage.setItem(KEYS.ORDERS, JSON.stringify(orders));
-  } catch (e) {
-    console.warn('Orders persistence failed', e);
-  }
-}
+export function loadOrders() { return load(KEYS.ORDERS, []); }
+export function saveOrders(orders) { save(KEYS.ORDERS, orders); }
 
 export function loadPrefs() {
-  return safeParse(localStorage.getItem(KEYS.PREFS), {
+  return load(KEYS.PREFS, {
     darkMode: true,
     currency: 'USD',
     notifications: true,
-    reducedMotion: false
+    reducedMotion: false,
+    emailMarketing: true,
+    smsAlerts: false
   });
 }
+export function savePrefs(prefs) { save(KEYS.PREFS, prefs); }
 
-export function savePrefs(prefs) {
-  try {
-    localStorage.setItem(KEYS.PREFS, JSON.stringify(prefs));
-  } catch (e) {
-    console.warn('Prefs persistence failed', e);
-  }
-}
-
-export function loadRecentSearches() {
-  return safeParse(localStorage.getItem(KEYS.RECENT_SEARCHES), []);
-}
-
+export function loadRecentSearches() { return load(KEYS.RECENT_SEARCHES, []); }
 export function saveRecentSearch(query) {
   if (!query || query.trim().length < 2) return;
   try {
-    const prev = loadRecentSearches().filter(q => q.toLowerCase() !== query.toLowerCase());
-    const next = [query.trim(), ...prev].slice(0, 8);
-    localStorage.setItem(KEYS.RECENT_SEARCHES, JSON.stringify(next));
+    const prev = loadRecentSearches().filter((q) => q.toLowerCase() !== query.toLowerCase());
+    save(KEYS.RECENT_SEARCHES, [query.trim(), ...prev].slice(0, 8));
   } catch {}
 }
 
-export function loadCompare() {
-  return safeParse(localStorage.getItem(KEYS.COMPARE), []);
-}
+export function loadCompare() { return load(KEYS.COMPARE, []); }
+export function saveCompare(ids) { save(KEYS.COMPARE, (ids || []).slice(0, 4)); }
 
-export function saveCompare(ids) {
-  try {
-    localStorage.setItem(KEYS.COMPARE, JSON.stringify(ids.slice(0, 4)));
-  } catch {}
-}
-
-export function loadUser() {
-  return safeParse(localStorage.getItem(KEYS.USER), null);
-}
-
+export function loadUser() { return load(KEYS.USER, null); }
 export function saveUser(user) {
-  try {
-    if (user) localStorage.setItem(KEYS.USER, JSON.stringify(user));
-    else localStorage.removeItem(KEYS.USER);
-  } catch {}
+  if (user) save(KEYS.USER, user);
+  else localStorage.removeItem(KEYS.USER);
 }
+
+export function loadUsersDb() { return load(KEYS.USERS, []); }
+export function saveUsersDb(users) { save(KEYS.USERS, users); }
+
+export function loadAddresses() { return load(KEYS.ADDRESSES, []); }
+export function saveAddresses(list) { save(KEYS.ADDRESSES, list); }
+
+export function loadPaymentMethods() { return load(KEYS.PAYMENTS, []); }
+export function savePaymentMethods(list) { save(KEYS.PAYMENTS, list); }
+
+export function loadRecentViewed() { return load(KEYS.RECENT_VIEWED, []); }
+export function saveRecentViewed(ids) { save(KEYS.RECENT_VIEWED, (ids || []).slice(0, 12)); }
+
+export function loadReviews() { return load(KEYS.REVIEWS, []); }
+export function saveReviews(list) { save(KEYS.REVIEWS, list); }
+
+export function loadReturns() { return load(KEYS.RETURNS, []); }
+export function saveReturns(list) { save(KEYS.RETURNS, list); }
+
+export function loadTickets() { return load(KEYS.TICKETS, []); }
+export function saveTickets(list) { save(KEYS.TICKETS, list); }
+
+export function loadCoupons() {
+  return load(KEYS.COUPONS, [
+    { code: 'AURA15', type: 'percent', value: 15, minOrder: 50, maxDiscount: 100, active: true, expires: '2026-12-31' },
+    { code: 'SAVE20', type: 'percent', value: 20, minOrder: 100, maxDiscount: 150, active: true, expires: '2026-12-31' },
+    { code: 'FLAT10', type: 'fixed', value: 10, minOrder: 40, maxDiscount: 10, active: true, expires: '2026-12-31' }
+  ]);
+}
+export function saveCoupons(list) { save(KEYS.COUPONS, list); }
+
+export function loadAlerts() { return load(KEYS.ALERTS, []); }
+export function saveAlerts(list) { save(KEYS.ALERTS, list); }
 
 export function clearAllCommerceData() {
-  Object.values(KEYS).forEach(k => {
+  Object.values(KEYS).forEach((k) => {
     try { localStorage.removeItem(k); } catch {}
   });
 }

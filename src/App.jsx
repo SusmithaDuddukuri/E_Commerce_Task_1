@@ -11,8 +11,10 @@ import Toast from './components/Toast';
 import CompareBar from './components/CompareBar';
 import OrderHistory from './components/OrderHistory';
 import SearchSuggestions from './components/SearchSuggestions';
+import AuthModal from './components/AuthModal';
+import AccountPortal from './components/AccountPortal';
 import { INITIAL_PRODUCTS, CATEGORIES, searchProducts, filterProducts, sortProducts } from './data/productsData';
-import { loadCart, saveCart, loadWishlist, saveWishlist, loadPrefs, savePrefs, loadOrders, saveOrders, saveRecentSearch, loadRecentSearches } from './utils/storage';
+import { loadCart, saveCart, loadWishlist, saveWishlist, loadPrefs, savePrefs, loadOrders, saveOrders, saveRecentSearch, loadRecentSearches, loadUser, saveUser, loadRecentViewed, saveRecentViewed } from './utils/storage';
 import { orderId } from './utils/formatters';
 import { ArrowRight, BarChart3, ChevronRight, CircleDollarSign, Crown, Flame, Heart, Layers3, Leaf, PackageCheck, Percent, Sparkles, Star, TrendingUp, Zap } from 'lucide-react';
 
@@ -52,6 +54,10 @@ export default function App() {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isOrdersOpen, setIsOrdersOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [user, setUser] = useState(() => loadUser());
+  const [recentViewed, setRecentViewed] = useState(() => loadRecentViewed());
   const [toasts, setToasts] = useState([]);
   const [spotlightIndex, setSpotlightIndex] = useState(0);
 
@@ -159,19 +165,32 @@ export default function App() {
   );
 
   const handleCompleteOrder = useCallback(
-    (shipping) => {
+    (payload) => {
       if (!cartItems.length) return;
-      const subtotal = cartItems.reduce((a, i) => a + i.price * i.quantity, 0);
-      const tax = subtotal * 0.08;
+      const shipping = payload?.shipping || payload || {};
+      const subtotal = payload?.subtotal ?? cartItems.reduce((a, i) => a + i.price * i.quantity, 0);
+      const tax = payload?.tax ?? subtotal * 0.08;
+      const discount = payload?.discount || 0;
+      const shippingCost = payload?.shippingCost || 0;
+      const total = payload?.total ?? subtotal + tax + shippingCost - discount;
       const order = {
         id: orderId(),
         createdAt: new Date().toISOString(),
         items: cartItems,
         subtotal,
         tax,
-        total: subtotal + tax,
+        discount,
+        shippingCost,
+        total,
         status: 'CONFIRMED',
-        shipping
+        trackingStatus: 'Confirmed',
+        trackingNumber: `TRK${Math.floor(Math.random() * 1e8)}`,
+        carrier: 'Aura Logistics',
+        shipping,
+        shippingMethod: payload?.shippingMethod || 'standard',
+        paymentId: payload?.paymentId || 'cod',
+        coupon: payload?.coupon || null,
+        userId: user?.id || null
       };
       setOrders(prev => [order, ...prev].slice(0, 40));
       setCartItems([]);
@@ -179,8 +198,46 @@ export default function App() {
       setIsCartOpen(false);
       addToast('Order confirmed', `${order.id} is being prepared.`);
     },
-    [cartItems, addToast]
+    [cartItems, addToast, user]
   );
+
+  const handleReorder = useCallback((order) => {
+    let added = 0;
+    (order.items || []).forEach((item) => {
+      const product = products.find((p) => p.id === item.id);
+      if (product && product.inStock !== false) {
+        handleAddToCart({ ...product, selectedColor: item.selectedColor });
+        added += 1;
+      }
+    });
+    if (added) {
+      setIsCartOpen(true);
+      addToast('Reorder', `${added} item(s) added to cart.`);
+    } else {
+      addToast('Unavailable', 'Those products are currently unavailable.', 'error');
+    }
+  }, [products, handleAddToCart, addToast]);
+
+  const handleCancelOrder = useCallback((orderIdToCancel) => {
+    setOrders((prev) =>
+      prev.map((o) =>
+        o.id === orderIdToCancel
+          ? { ...o, status: 'CANCELLED', trackingStatus: 'Cancelled' }
+          : o
+      )
+    );
+    addToast('Order cancelled', orderIdToCancel);
+  }, [addToast]);
+
+  const openProduct = useCallback((product) => {
+    setSelectedProduct(product);
+    if (!product?.id) return;
+    setRecentViewed((prev) => {
+      const next = [product.id, ...prev.filter((id) => id !== product.id)].slice(0, 12);
+      saveRecentViewed(next);
+      return next;
+    });
+  }, []);
 
   const toggleCompare = useCallback(
     (id) =>
@@ -242,6 +299,9 @@ export default function App() {
         setIsDarkMode={setIsDarkMode}
         onOpenOrders={() => setIsOrdersOpen(true)}
         ordersCount={orders.length}
+        user={user}
+        onOpenAccount={() => setIsAccountOpen(true)}
+        onOpenAuth={() => setIsAuthOpen(true)}
       />
 
       {showSuggestions && (
@@ -263,7 +323,7 @@ export default function App() {
             <HeroBanner
               onExplore={scrollToCatalog}
               featuredProduct={spotlightProduct}
-              onQuickView={setSelectedProduct}
+              onQuickView={openProduct}
               onAddToCart={handleAddToCart}
             />
 
@@ -375,7 +435,7 @@ export default function App() {
             <div id="catalog-grid">
               <ProductGrid
                 products={filteredProducts}
-                onSelectProduct={setSelectedProduct}
+                onSelectProduct={openProduct}
                 onAddToCart={handleAddToCart}
                 addedItems={addedTracker}
                 wishlistMap={wishlistMap}
@@ -415,7 +475,7 @@ export default function App() {
                   <button
                     key={p.id}
                     type="button"
-                    onClick={() => setSelectedProduct(p)}
+                    onClick={() => openProduct(p)}
                     className="mini-product group text-left"
                   >
                     <div className="relative overflow-hidden rounded-xl">
@@ -498,6 +558,7 @@ export default function App() {
         onClose={() => setIsCheckoutOpen(false)}
         cartItems={cartItems}
         onCompleteOrder={handleCompleteOrder}
+        user={user}
       />
       <OrderHistory isOpen={isOrdersOpen} onClose={() => setIsOrdersOpen(false)} orders={orders} />
       <CompareBar
@@ -505,7 +566,32 @@ export default function App() {
         products={products}
         onClear={() => setCompareIds([])}
         onRemove={(id) => setCompareIds(prev => prev.filter(x => x !== id))}
-        onSelectProduct={setSelectedProduct}
+        onSelectProduct={openProduct}
+      />
+      <AuthModal
+        open={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        onAuth={(session) => {
+          setUser(session);
+          addToast('Welcome', session.name || session.email);
+        }}
+      />
+      <AccountPortal
+        open={isAccountOpen}
+        onClose={() => setIsAccountOpen(false)}
+        user={user}
+        onUpdateUser={setUser}
+        onLogout={() => {
+          saveUser(null);
+          setUser(null);
+          setIsAccountOpen(false);
+          addToast('Signed out', 'See you next time.');
+        }}
+        orders={orders}
+        wishlistCount={wishlistItems.length}
+        onReorder={handleReorder}
+        onCancelOrder={handleCancelOrder}
+        onToast={addToast}
       />
       <Toast toasts={toasts} onDismiss={removeToast} />
 

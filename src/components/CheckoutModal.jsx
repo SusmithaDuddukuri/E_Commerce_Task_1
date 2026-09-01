@@ -1,212 +1,274 @@
-import React, { useState, useEffect } from 'react';
-import { X, CheckCircle2, CreditCard, ShieldCheck, ArrowRight, Truck, Lock } from 'lucide-react';
-import { formatPrice } from '../utils/formatters';
-import { validateShipping, validatePayment, hasErrors } from '../utils/validators';
+import React, { useMemo, useState, useEffect } from 'react';
+import { loadAddresses, loadCoupons, loadPaymentMethods } from '../utils/storage';
 
-const DEFAULT_FORM = {
-  firstName: '',
-  lastName: '',
-  email: '',
-  address: '',
-  city: '',
-  zip: '',
-  cardNumber: '',
-  expDate: '',
-  cvv: ''
-};
+const STEPS = ['Address', 'Shipping', 'Payment', 'Review'];
 
-export default function CheckoutModal({ isOpen, onClose, cartItems, onCompleteOrder }) {
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({ ...DEFAULT_FORM });
+export default function CheckoutModal({ isOpen, onClose, cartItems, onCompleteOrder, user }) {
+  const [step, setStep] = useState(0);
+  const [addresses, setAddresses] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState('');
+  const [shippingMethod, setShippingMethod] = useState('standard');
+  const [paymentId, setPaymentId] = useState('');
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponError, setCouponError] = useState('');
+  const [guest, setGuest] = useState({
+    fullName: '',
+    phone: '',
+    line1: '',
+    city: '',
+    state: '',
+    postal: '',
+    country: 'United States'
+  });
   const [errors, setErrors] = useState({});
-  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
-      setStep(1);
-      setErrors({});
-      setSubmitting(false);
-      setFormData({
-        firstName: 'Alex',
-        lastName: 'Morgan',
-        email: 'alex.morgan@aura-luxe.io',
-        address: '742 Evergreen Terrace',
-        city: 'San Francisco',
-        zip: '94107',
-        cardNumber: '4242 4242 4242 4242',
-        expDate: '12/28',
-        cvv: '123'
-      });
-    }
+    if (!isOpen) return;
+    setStep(0);
+    setAppliedCoupon(null);
+    setCouponCode('');
+    setCouponError('');
+    const addrs = loadAddresses();
+    setAddresses(addrs);
+    const def = addrs.find((a) => a.isDefaultShipping) || addrs[0];
+    setSelectedAddressId(def?.id || '');
+    const pays = loadPaymentMethods();
+    setPayments(pays);
+    setPaymentId(pays.find((p) => p.isDefault)?.id || pays[0]?.id || 'cod');
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  const subtotal = useMemo(
+    () => cartItems.reduce((a, i) => a + i.price * i.quantity, 0),
+    [cartItems]
+  );
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const tax = subtotal * 0.08;
-  const shipping = subtotal > 200 ? 0 : 12;
-  const grandTotal = subtotal + tax + shipping;
+  const shippingCost = shippingMethod === 'express' ? 18 : shippingMethod === 'pickup' ? 0 : subtotal >= 300 ? 0 : 12;
 
-  const updateField = (key, value) => {
-    setFormData(prev => ({ ...prev, [key]: value }));
-    if (errors[key]) setErrors(prev => {
-      const next = { ...prev };
-      delete next[key];
-      return next;
+  const discount = useMemo(() => {
+    if (!appliedCoupon) return 0;
+    if (subtotal < (appliedCoupon.minOrder || 0)) return 0;
+    if (appliedCoupon.type === 'percent') {
+      return Math.min((subtotal * appliedCoupon.value) / 100, appliedCoupon.maxDiscount ?? Infinity);
+    }
+    return Math.min(appliedCoupon.value, appliedCoupon.maxDiscount ?? appliedCoupon.value);
+  }, [appliedCoupon, subtotal]);
+
+  const taxable = Math.max(0, subtotal - discount);
+  const tax = taxable * 0.08;
+  const total = taxable + tax + shippingCost;
+
+  const applyCoupon = () => {
+    const list = loadCoupons();
+    const found = list.find((c) => c.code.toUpperCase() === couponCode.trim().toUpperCase() && c.active);
+    if (!found) {
+      setCouponError('Invalid or inactive code.');
+      setAppliedCoupon(null);
+      return;
+    }
+    if (subtotal < (found.minOrder || 0)) {
+      setCouponError(`Minimum order $${found.minOrder} required.`);
+      setAppliedCoupon(null);
+      return;
+    }
+    setAppliedCoupon(found);
+    setCouponError('');
+  };
+
+  const validateAddress = () => {
+    if (selectedAddressId) return true;
+    const e = {};
+    if (!guest.fullName.trim()) e.fullName = 'Required';
+    if (!guest.line1.trim()) e.line1 = 'Required';
+    if (!guest.city.trim()) e.city = 'Required';
+    if (!guest.postal.trim()) e.postal = 'Required';
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const next = () => {
+    if (step === 0 && !validateAddress()) return;
+    if (step < STEPS.length - 1) setStep((s) => s + 1);
+  };
+
+  const placeOrder = () => {
+    const shipping =
+      selectedAddressId
+        ? addresses.find((a) => a.id === selectedAddressId)
+        : { ...guest };
+    onCompleteOrder?.({
+      shipping,
+      shippingMethod,
+      paymentId,
+      coupon: appliedCoupon?.code || null,
+      discount,
+      tax,
+      shippingCost,
+      subtotal,
+      total
     });
   };
 
-  const goToPayment = (e) => {
-    e.preventDefault();
-    const errs = validateShipping(formData);
-    if (hasErrors(errs)) {
-      setErrors(errs);
-      return;
-    }
-    setErrors({});
-    setStep(2);
-  };
-
-  const handleSubmitPayment = (e) => {
-    e.preventDefault();
-    const errs = validatePayment(formData);
-    if (hasErrors(errs)) {
-      setErrors(errs);
-      return;
-    }
-    if (!cartItems.length) return;
-    setSubmitting(true);
-    setStep(3);
-    setTimeout(() => {
-      onCompleteOrder({
-        name: `${formData.firstName} ${formData.lastName}`,
-        email: formData.email,
-        address: formData.address,
-        city: formData.city,
-        zip: formData.zip
-      });
-      setSubmitting(false);
-    }, 2800);
-  };
-
-  const fieldClass = (key) =>
-    `w-full rounded-xl bg-slate-950/60 border px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 ${
-      errors[key] ? 'border-rose-500/70' : 'border-slate-700'
-    }`;
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div onClick={onClose} className="fixed inset-0 bg-slate-950/85 backdrop-blur-md" />
-      <div className="relative w-full max-w-2xl glass-panel rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 z-10 my-8">
-        <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900/60">
-          <div className="flex items-center space-x-2">
-            <Lock className="w-4 h-4 text-emerald-400" />
-            <h2 className="text-base font-bold text-slate-900 dark:text-white">Express Checkout</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-slate-900/50" onClick={onClose} />
+      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl">
+        <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between sticky top-0 bg-white dark:bg-slate-900">
+          <div>
+            <h2 className="font-semibold text-slate-900 dark:text-white">Checkout</h2>
+            <p className="text-xs text-slate-500">
+              Step {step + 1} of {STEPS.length}: {STEPS[step]}
+              {user ? ` · ${user.name}` : ' · Guest'}
+            </p>
           </div>
-          <button type="button" onClick={onClose} className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white">
-            <X className="w-5 h-5" />
+          <button type="button" onClick={onClose} className="text-sm text-slate-500">
+            Close
           </button>
         </div>
 
-        <div className="grid grid-cols-3 text-center text-[10px] font-mono border-b border-slate-200 dark:border-slate-800 bg-slate-950/40">
-          <div className={`py-2 border-r border-slate-200 dark:border-slate-800 ${step >= 1 ? 'text-indigo-400 font-bold bg-indigo-500/10' : 'text-slate-600'}`}>1. Shipping</div>
-          <div className={`py-2 border-r border-slate-200 dark:border-slate-800 ${step >= 2 ? 'text-indigo-400 font-bold bg-indigo-500/10' : 'text-slate-600'}`}>2. Payment</div>
-          <div className={`py-2 ${step === 3 ? 'text-emerald-400 font-bold bg-emerald-500/10' : 'text-slate-600'}`}>3. Confirmed</div>
+        <div className="flex gap-1 px-5 pt-3">
+          {STEPS.map((s, i) => (
+            <div
+              key={s}
+              className={`flex-1 h-1 rounded ${i <= step ? 'bg-slate-900 dark:bg-white' : 'bg-slate-200 dark:bg-slate-700'}`}
+            />
+          ))}
         </div>
 
-        <div className="p-6 sm:p-8">
+        <div className="p-5 space-y-4">
+          {step === 0 && (
+            <div className="space-y-3">
+              {addresses.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-slate-600 dark:text-slate-300">Saved addresses</p>
+                  {addresses.map((a) => (
+                    <label key={a.id} className="flex gap-2 items-start rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-sm cursor-pointer">
+                      <input
+                        type="radio"
+                        name="addr"
+                        checked={selectedAddressId === a.id}
+                        onChange={() => setSelectedAddressId(a.id)}
+                      />
+                      <span>
+                        <span className="font-medium text-slate-900 dark:text-white">{a.fullName}</span>
+                        <span className="block text-xs text-slate-500">
+                          {a.line1}, {a.city}
+                        </span>
+                      </span>
+                    </label>
+                  ))}
+                  <button type="button" className="text-xs underline text-slate-500" onClick={() => setSelectedAddressId('')}>
+                    Use a different address
+                  </button>
+                </div>
+              )}
+              {!selectedAddressId && (
+                <div className="space-y-2">
+                  {['fullName', 'phone', 'line1', 'city', 'state', 'postal', 'country'].map((f) => (
+                    <label key={f} className="block text-xs text-slate-600 dark:text-slate-300 capitalize">
+                      {f}
+                      <input
+                        className="mt-1 w-full rounded-md border border-slate-300 dark:border-slate-600 bg-transparent px-3 py-2 text-sm"
+                        value={guest[f] || ''}
+                        onChange={(e) => setGuest((g) => ({ ...g, [f]: e.target.value }))}
+                      />
+                      {errors[f] && <span className="text-rose-600">{errors[f]}</span>}
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {step === 1 && (
-            <form onSubmit={goToPayment} className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-[11px] text-slate-500 dark:text-slate-400 mb-1 block">First name</label>
-                  <input className={fieldClass('firstName')} value={formData.firstName} onChange={e => updateField('firstName', e.target.value)} />
-                  {errors.firstName && <p className="text-[11px] text-rose-400 mt-1">{errors.firstName}</p>}
-                </div>
-                <div>
-                  <label className="text-[11px] text-slate-500 dark:text-slate-400 mb-1 block">Last name</label>
-                  <input className={fieldClass('lastName')} value={formData.lastName} onChange={e => updateField('lastName', e.target.value)} />
-                  {errors.lastName && <p className="text-[11px] text-rose-400 mt-1">{errors.lastName}</p>}
-                </div>
-              </div>
-              <div>
-                <label className="text-[11px] text-slate-500 dark:text-slate-400 mb-1 block">Email</label>
-                <input type="email" className={fieldClass('email')} value={formData.email} onChange={e => updateField('email', e.target.value)} />
-                {errors.email && <p className="text-[11px] text-rose-400 mt-1">{errors.email}</p>}
-              </div>
-              <div>
-                <label className="text-[11px] text-slate-500 dark:text-slate-400 mb-1 block">Address</label>
-                <input className={fieldClass('address')} value={formData.address} onChange={e => updateField('address', e.target.value)} />
-                {errors.address && <p className="text-[11px] text-rose-400 mt-1">{errors.address}</p>}
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-[11px] text-slate-500 dark:text-slate-400 mb-1 block">City</label>
-                  <input className={fieldClass('city')} value={formData.city} onChange={e => updateField('city', e.target.value)} />
-                  {errors.city && <p className="text-[11px] text-rose-400 mt-1">{errors.city}</p>}
-                </div>
-                <div>
-                  <label className="text-[11px] text-slate-500 dark:text-slate-400 mb-1 block">ZIP</label>
-                  <input className={fieldClass('zip')} value={formData.zip} onChange={e => updateField('zip', e.target.value)} />
-                  {errors.zip && <p className="text-[11px] text-rose-400 mt-1">{errors.zip}</p>}
-                </div>
-              </div>
-              <button type="submit" className="w-full mt-2 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-slate-900 dark:text-white font-semibold flex items-center justify-center gap-2">
-                Continue to Payment <ArrowRight className="w-4 h-4" />
-              </button>
-            </form>
+            <div className="space-y-2">
+              {[
+                { id: 'standard', label: 'Standard (3–5 days)', price: subtotal >= 300 ? 'Free' : '$12' },
+                { id: 'express', label: 'Express (1–2 days)', price: '$18' },
+                { id: 'pickup', label: 'Store pickup', price: 'Free' }
+              ].map((m) => (
+                <label key={m.id} className="flex items-center justify-between rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-sm cursor-pointer">
+                  <span className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="ship"
+                      checked={shippingMethod === m.id}
+                      onChange={() => setShippingMethod(m.id)}
+                    />
+                    {m.label}
+                  </span>
+                  <span className="text-slate-500">{m.price}</span>
+                </label>
+              ))}
+            </div>
           )}
 
           {step === 2 && (
-            <form onSubmit={handleSubmitPayment} className="space-y-4">
-              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-2">
-                <Truck className="w-4 h-4 text-indigo-400" />
-                Shipping to {formData.city}, {formData.zip}
-                <button type="button" onClick={() => setStep(1)} className="text-indigo-400 hover:underline ml-auto">Edit</button>
+            <div className="space-y-3">
+              <label className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-sm">
+                <input type="radio" checked={paymentId === 'cod'} onChange={() => setPaymentId('cod')} />
+                Pay on delivery / demo pay
+              </label>
+              {payments.map((p) => (
+                <label key={p.id} className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-sm">
+                  <input type="radio" checked={paymentId === p.id} onChange={() => setPaymentId(p.id)} />
+                  {p.brand} •••• {p.last4}
+                </label>
+              ))}
+              <div className="flex gap-2">
+                <input
+                  className="flex-1 rounded-md border border-slate-300 dark:border-slate-600 bg-transparent px-3 py-2 text-sm"
+                  placeholder="Coupon code"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                />
+                <button type="button" onClick={applyCoupon} className="text-xs px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600">
+                  Apply
+                </button>
               </div>
-              <div>
-                <label className="text-[11px] text-slate-500 dark:text-slate-400 mb-1 block">Card number</label>
-                <div className="relative">
-                  <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                  <input className={`${fieldClass('cardNumber')} pl-10`} value={formData.cardNumber} onChange={e => updateField('cardNumber', e.target.value)} placeholder="4242 4242 4242 4242" />
-                </div>
-                {errors.cardNumber && <p className="text-[11px] text-rose-400 mt-1">{errors.cardNumber}</p>}
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-[11px] text-slate-500 dark:text-slate-400 mb-1 block">Expiry</label>
-                  <input className={fieldClass('expDate')} value={formData.expDate} onChange={e => updateField('expDate', e.target.value)} placeholder="MM/YY" />
-                  {errors.expDate && <p className="text-[11px] text-rose-400 mt-1">{errors.expDate}</p>}
-                </div>
-                <div>
-                  <label className="text-[11px] text-slate-500 dark:text-slate-400 mb-1 block">CVV</label>
-                  <input className={fieldClass('cvv')} value={formData.cvv} onChange={e => updateField('cvv', e.target.value)} placeholder="123" />
-                  {errors.cvv && <p className="text-[11px] text-rose-400 mt-1">{errors.cvv}</p>}
-                </div>
-              </div>
-              <div className="rounded-xl bg-slate-950/50 border border-slate-200 dark:border-slate-800 p-4 space-y-2 text-sm">
-                <div className="flex justify-between text-slate-500 dark:text-slate-400"><span>Subtotal</span><span>{formatPrice(subtotal)}</span></div>
-                <div className="flex justify-between text-slate-500 dark:text-slate-400"><span>Tax (8%)</span><span>{formatPrice(tax)}</span></div>
-                <div className="flex justify-between text-slate-500 dark:text-slate-400"><span>Shipping</span><span>{shipping === 0 ? 'Free' : formatPrice(shipping)}</span></div>
-                <div className="flex justify-between text-slate-900 dark:text-white font-bold pt-2 border-t border-slate-200 dark:border-slate-800"><span>Total</span><span>{formatPrice(grandTotal)}</span></div>
-              </div>
-              <button type="submit" disabled={submitting} className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 text-slate-900 dark:text-white font-semibold flex items-center justify-center gap-2">
-                <ShieldCheck className="w-4 h-4" /> Pay {formatPrice(grandTotal)}
-              </button>
-            </form>
+              {couponError && <p className="text-xs text-rose-600">{couponError}</p>}
+              {appliedCoupon && (
+                <p className="text-xs text-teal-700">Applied {appliedCoupon.code} (−${discount.toFixed(2)})</p>
+              )}
+            </div>
           )}
 
           {step === 3 && (
-            <div className="text-center py-10 space-y-4">
-              <div className="mx-auto w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between"><span className="text-slate-500">Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500">Discount</span><span>−${discount.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500">Shipping</span><span>${shippingCost.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500">Tax (8%)</span><span>${tax.toFixed(2)}</span></div>
+              <div className="flex justify-between font-semibold text-base border-t border-slate-200 dark:border-slate-700 pt-2">
+                <span>Total</span><span>${total.toFixed(2)}</span>
               </div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white">Order confirmed</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-                Your simulated payment succeeded. A receipt would be emailed to {formData.email}.
+              <p className="text-xs text-slate-500 pt-2">
+                {cartItems.length} item(s) · {shippingMethod} · {paymentId === 'cod' ? 'Demo pay' : 'Card on file'}
               </p>
             </div>
           )}
+
+          <div className="flex justify-between gap-2 pt-2">
+            <button
+              type="button"
+              className="text-xs px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600"
+              onClick={() => (step === 0 ? onClose() : setStep((s) => s - 1))}
+            >
+              {step === 0 ? 'Cancel' : 'Back'}
+            </button>
+            {step < STEPS.length - 1 ? (
+              <button type="button" onClick={next} className="text-xs px-4 py-2 rounded-md bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold">
+                Continue
+              </button>
+            ) : (
+              <button type="button" onClick={placeOrder} className="text-xs px-4 py-2 rounded-md bg-teal-700 text-white font-semibold">
+                Place order
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
