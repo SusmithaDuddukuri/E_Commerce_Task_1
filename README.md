@@ -1,54 +1,54 @@
-# Aura Commerce — Interactive Luxury E-Commerce Platform
+# Aura Commerce
 
-Proprietary interactive React + Vite + Tailwind storefront.
+Interactive React + Vite + Tailwind storefront (demo / sandbox).
 
-## Features
-
-- Product catalog (100+ storefront items + extended engine catalog)
-- Search, filters, sort, product compare
-- Cart & wishlist with localStorage persistence
-- Multi-step checkout with form validation
-- Order history
-- Merchant dashboard
-- Pricing, inventory, shipping, loyalty, and analytics engines
-
-## Install
-
-```bash
-npm install
-```
-
-## Run
-
-```bash
-npm run dev
-```
-
-## Build
-
-```bash
-npm run build
-```
-
-## Test
-
-```bash
-npm test
-```
-
-## License
-
-Proprietary — see `LICENSE`. Not open source (not MIT/Apache/GPL).
-
-## Interactive storefront refresh
-
-The storefront now includes a cinematic hero spotlight, rotating flagship product, launch countdown, category tiles, live showroom pulse, member offer strip, stock-pressure indicators, compare controls, trending products, quick-view interactions, cart/wishlist persistence, checkout validation, order history, and a merchant intelligence view.
-
-Run locally:
+## Quick start
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open http://localhost:5173
+## Demo account
+
+- Email: `demo@aura.com`
+- Password: `demo`
+
+Or create an account via **Sign in → Create account**.
+
+## What's included
+
+### Storefront
+- Product catalog, search, filters, sort, compare
+- Product modal, cart, wishlist (localStorage)
+- Multi-step checkout (address → shipping → payment → review)
+- Coupons: `AURA15`, `SAVE20`, `FLAT10`
+- Light / dark theme
+- Merchant suite toggle
+
+### Customer account
+- Sign up / login / logout / forgot password (demo)
+- Profile overview & loyalty tier/points
+- Order history with tracking steps, cancel, buy again
+- Address book (add / edit / delete / defaults)
+- Saved payment methods (last 4 digits only — never full PAN/CVV)
+- Returns requests
+- Support tickets
+- Communication preferences
+
+### Persistence
+Cart, wishlist, orders, user session, addresses, payments, returns, tickets, and prefs are stored in the browser.
+
+## Scripts
+
+| Command | Purpose |
+|---------|---------|
+| `npm run dev` | Local development |
+| `npm run build` | Production build |
+| `npm test` | Vitest unit tests |
+
+## Notes
+
+- No real payments, email, or maps APIs
+- Not for production clinical/financial use
+- Git history includes feature-branch merges (PR-style)
