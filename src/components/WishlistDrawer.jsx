@@ -14,14 +14,14 @@ export default function WishlistDrawer({
     <div className="fixed inset-0 z-50 overflow-hidden">
       <div 
         onClick={onClose}
-        className="absolute inset-0 bg-slate-50 dark:bg-slate-900/50 dark:bg-slate-950/80 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-slate-900/25 dark:bg-slate-950/60 backdrop-blur-[2px] transition-opacity"
       />
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md glass-panel border-l border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-2xl">
+        <div className="w-screen max-w-[min(28rem,calc(100vw-1rem))] bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-2xl">
           
           {/* Header */}
-          <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+          <div className="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">Saved Wishlist</h2>
@@ -30,21 +30,21 @@ export default function WishlistDrawer({
               </span>
             </div>
 
-            <button
+            <button type="button"
               onClick={onClose}
-              className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors"
+              className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Wishlist Items List */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
             {wishlistItems.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center space-y-3 text-slate-500">
                 <Heart className="w-12 h-12 stroke-[1]" />
                 <p className="text-sm font-medium">Your wishlist is currently empty.</p>
-                <button
+                <button type="button"
                   onClick={onClose}
                   className="px-4 py-2 rounded-full text-xs font-semibold bg-rose-500/20 text-rose-400 border border-rose-500/30"
                 >
@@ -68,7 +68,7 @@ export default function WishlistDrawer({
                     <span className="text-xs font-semibold text-indigo-300 mt-1 block">${item.price}</span>
                   </div>
 
-                  <button
+                  <button type="button"
                     onClick={() => onMoveToCart(item)}
                     className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-slate-900 dark:text-white text-xs font-semibold flex items-center space-x-1"
                     title="Move to Shopping Bag"
@@ -77,7 +77,7 @@ export default function WishlistDrawer({
                     <span>Add</span>
                   </button>
 
-                  <button
+                  <button type="button"
                     onClick={() => onRemoveFromWishlist(item.id)}
                     className="p-1 text-slate-500 hover:text-rose-400 transition-colors"
                     title="Remove from Wishlist"

@@ -37,7 +37,7 @@ export default function CartDrawer({
       {/* Backdrop */}
       <div 
         onClick={onClose}
-        className="absolute inset-0 bg-slate-50 dark:bg-slate-900/50 dark:bg-slate-950/80 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-slate-950/35 dark:bg-slate-950/45 backdrop-blur-[2px] transition-opacity"
       />
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
@@ -53,7 +53,7 @@ export default function CartDrawer({
               </span>
             </div>
 
-            <button
+            <button type="button"
               onClick={onClose}
               className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors"
             >
@@ -67,7 +67,7 @@ export default function CartDrawer({
               <div className="h-full flex flex-col items-center justify-center text-center space-y-3 text-slate-500">
                 <ShoppingBag className="w-12 h-12 stroke-[1]" />
                 <p className="text-sm font-medium">Your shopping bag is currently empty.</p>
-                <button
+                <button type="button"
                   onClick={onClose}
                   className="px-4 py-2 rounded-full text-xs font-semibold bg-indigo-600/20 text-indigo-400 border border-indigo-500/30"
                 >
@@ -95,23 +95,23 @@ export default function CartDrawer({
                   </div>
 
                   {/* Quantity Controls */}
-                  <div className="flex items-center space-x-2 bg-slate-950 rounded-lg p-1 border border-slate-200 dark:border-slate-800">
-                    <button
+                  <div className="flex items-center space-x-1.5 bg-white dark:bg-slate-950 rounded-lg p-1 border border-slate-300 dark:border-slate-700 shadow-sm">
+                    <button type="button"
                       onClick={() => onUpdateQuantity(item.id, item.selectedColor, item.quantity - 1)}
-                      className="p-1 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white"
+                      className="p-1 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-300"
                     >
                       <Minus className="w-3 h-3" />
                     </button>
-                    <span className="text-xs font-semibold text-slate-900 dark:text-white px-1">{item.quantity}</span>
-                    <button
+                    <span className="min-w-6 text-center text-sm font-extrabold text-fuchsia-600 dark:text-fuchsia-300 bg-fuchsia-50 dark:bg-fuchsia-500/10 rounded-md px-1.5 py-0.5">{item.quantity}</span>
+                    <button type="button"
                       onClick={() => onUpdateQuantity(item.id, item.selectedColor, item.quantity + 1)}
-                      className="p-1 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white"
+                      className="p-1 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-300"
                     >
                       <Plus className="w-3 h-3" />
                     </button>
                   </div>
 
-                  <button
+                  <button type="button"
                     onClick={() => onRemoveItem(item.id, item.selectedColor)}
                     className="p-1 text-slate-500 hover:text-rose-400 transition-colors"
                   >
@@ -174,7 +174,7 @@ export default function CartDrawer({
               </div>
 
               {/* Checkout CTA Button */}
-              <button
+              <button type="button"
                 onClick={onProceedToCheckout}
                 className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-slate-900 dark:text-white font-semibold text-sm shadow-xl shadow-indigo-600/25 transition-all flex items-center justify-center space-x-2 group"
               >

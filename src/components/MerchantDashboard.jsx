@@ -84,7 +84,7 @@ export default function MerchantDashboard({ onTriggerToast }) {
           {/* Timeframe selector */}
           <div className="flex bg-slate-900 rounded-full p-1 border border-slate-800 text-xs">
             {['24h', '7d', '30d', '1y'].map((tf) => (
-              <button
+              <button type="button"
                 key={tf}
                 onClick={() => setSelectedTimeframe(tf)}
                 className={`px-3 py-1 rounded-full transition-all ${
@@ -97,7 +97,7 @@ export default function MerchantDashboard({ onTriggerToast }) {
           </div>
 
           {/* Export CSV Button */}
-          <button
+          <button type="button"
             onClick={handleExportCSV}
             className="glass-pill px-3.5 py-2 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:border-indigo-500 flex items-center space-x-1.5 border border-slate-800 transition-all active:scale-95"
           >
@@ -208,7 +208,7 @@ export default function MerchantDashboard({ onTriggerToast }) {
             <h3 className="text-sm font-bold text-white">Live Transaction Stream</h3>
             <p className="text-[11px] text-slate-400">Live order operations</p>
           </div>
-          <button
+          <button type="button"
             onClick={handleSimulateLiveOrder}
             className="px-3 py-1.5 rounded-full bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 text-xs font-semibold flex items-center space-x-1.5 hover:bg-indigo-600 hover:text-white transition-all"
           >

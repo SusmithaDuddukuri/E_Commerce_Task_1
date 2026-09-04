@@ -25,7 +25,9 @@ const CATEGORY_META = {
   Wearables: { icon: Crown, text: 'Watches and smart devices', accent: 'amber' },
   'Home & Living': { icon: Leaf, text: 'Everyday essentials', accent: 'emerald' },
   Furniture: { icon: Layers3, text: 'Seating and storage', accent: 'rose' },
-  Compute: { icon: BarChart3, text: 'Laptops and accessories', accent: 'violet' }
+  Compute: { icon: BarChart3, text: 'Laptops and accessories', accent: 'violet' },
+  Optics: { icon: Sparkles, text: 'Cameras, lenses & optical gear', accent: 'sky' },
+  Accessories: { icon: PackageCheck, text: 'Useful add-ons and essentials', accent: 'slate' }
 };
 
 export default function App() {
@@ -262,18 +264,26 @@ export default function App() {
   const scrollToCatalog = () =>
     document.getElementById('catalog-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
+  // Category navigation is centralized so every category entry (navbar, mobile menu,
+  // and storefront tiles) produces the same filtered catalog instead of relying on
+  // stale filters/search state or scrolling before React has rendered the new list.
+  const navigateToCategory = useCallback((category) => {
+    setActiveCategory(category);
+    setSearchQuery('');
+    setInStockOnly(false);
+    setMinRating(0);
+    setPriceRange([0, 2000]);
+    setSortBy('featured');
+    setShowSuggestions(false);
+    setCurrentView('storefront');
+    setTimeout(() => document.getElementById('catalog-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 180);
+  }, []);
+
   return (
     <div className="app-shell min-h-screen text-slate-900 dark:text-slate-100">
       <Navbar
         activeCategory={activeCategory}
-        setActiveCategory={(c) => {
-          setActiveCategory(c);
-          setCurrentView('storefront');
-          // Scroll to product grid after state updates
-          setTimeout(() => {
-            document.getElementById('catalog-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 50);
-        }}
+        setActiveCategory={navigateToCategory}
         categories={CATEGORIES}
         cartCount={cartCount}
         setIsCartOpen={setIsCartOpen}
@@ -392,10 +402,7 @@ export default function App() {
                     <button
                       key={category}
                       type="button"
-                      onClick={() => {
-                        setActiveCategory(category);
-                        scrollToCatalog();
-                      }}
+                      onClick={() => navigateToCategory(category)}
                       className="category-tile group"
                     >
                       <div className="category-icon">
@@ -535,7 +542,7 @@ export default function App() {
               <div className="grid md:grid-cols-3 gap-4 mt-10">
                 {[['Customer first','Simple discovery, transparent order status and account tools.'],['Reliable operations','Inventory, fulfillment and support workflows are organized by role.'],['Secure by design','Each workspace exposes only the actions relevant to the signed-in role.']].map(([t,d])=><div className="glass-card rounded-xl p-5" key={t}><h3 className="font-semibold text-slate-900 dark:text-white">{t}</h3><p className="text-sm text-slate-500 mt-2 leading-6">{d}</p></div>)}
               </div>
-              <button className="primary-cta mt-8" onClick={() => { setCurrentView('storefront'); setTimeout(scrollToCatalog,50); }}>Start shopping <ArrowRight className="w-4 h-4"/></button>
+              <button type="button" className="primary-cta mt-8" onClick={() => { setCurrentView('storefront'); setTimeout(scrollToCatalog,50); }}>Start shopping <ArrowRight className="w-4 h-4"/></button>
             </div>
           </section>
         ) : (

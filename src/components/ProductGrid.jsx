@@ -103,14 +103,14 @@ export default function ProductGrid({
                   </span>
 
                   <div className="flex items-center gap-2 pointer-events-auto">
-                    <button
+                    <button type="button"
                       onClick={() => onToggleCompare?.(product.id)}
                       className={`p-2 rounded-full backdrop-blur-md border transition-all shadow-md ${compareIds.includes(product.id) ? 'bg-indigo-500/25 border-indigo-400 text-indigo-200' : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-white'}`}
                       title={compareIds.includes(product.id) ? 'Remove from compare' : 'Compare product'}
                     >
                       <GitCompare className="w-4 h-4" />
                     </button>
-                    <button
+                    <button type="button"
                     onClick={() => onToggleWishlist(product)}
                     className={`p-2 rounded-full backdrop-blur-md border transition-all pointer-events-auto shadow-md ${
                       isWishlisted 
@@ -126,7 +126,7 @@ export default function ProductGrid({
 
                 {/* Hover Quick View Overlay */}
                 <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 backdrop-blur-[2px] transition-opacity duration-300 flex items-center justify-center space-x-3">
-                  <button
+                  <button type="button"
                     onClick={() => onSelectProduct(product)}
                     className="px-4 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-white hover:bg-indigo-600 hover:text-white hover:border-indigo-500 transition-all flex items-center space-x-1.5 shadow-lg"
                   >
@@ -177,7 +177,7 @@ export default function ProductGrid({
                     </div>
                   </div>
 
-                  <button
+                  <button type="button"
                     onClick={() => onAddToCart(product)}
                     className={`p-2.5 rounded-full transition-all duration-200 shadow-md ${
                       isAdded

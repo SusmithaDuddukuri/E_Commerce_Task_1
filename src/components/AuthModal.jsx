@@ -102,10 +102,10 @@ export default function AuthModal({ open, onClose, onAuth, mode: initialMode = '
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4">
       <div className="absolute inset-0 bg-slate-900/50" onClick={onClose} />
-      <div className="relative w-full max-w-md rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-700">
+      <div className="relative w-full max-w-sm max-h-[calc(100vh-1.5rem)] sm:max-h-[calc(100vh-2rem)] overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl">
+        <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700">
           <h2 className="font-semibold text-slate-900 dark:text-white">
             {mode === 'login' && 'Sign in'}
             {mode === 'signup' && 'Create account'}
@@ -115,12 +115,12 @@ export default function AuthModal({ open, onClose, onAuth, mode: initialMode = '
             Close
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="p-5 space-y-3">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-4 space-y-2.5">
           {mode === 'signup' && (
             <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
               Name
               <input
-                className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-950 px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-950 px-3 py-1.5 text-sm"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 autoComplete="name"
@@ -130,7 +130,7 @@ export default function AuthModal({ open, onClose, onAuth, mode: initialMode = '
           {mode !== 'forgot' && (
             <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
               Account type
-              <select value={role} onChange={(e) => setRole(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-950 px-3 py-2 text-sm">
+              <select value={role} onChange={(e) => setRole(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-950 px-3 py-1.5 text-sm">
                 <option value="customer">Customer</option>
                 <option value="admin">Administrator</option>
                 <option value="worker">Worker</option>
@@ -144,7 +144,7 @@ export default function AuthModal({ open, onClose, onAuth, mode: initialMode = '
             Email
             <input
               type="email"
-              className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-950 px-3 py-2 text-sm"
+              className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-950 px-3 py-1.5 text-sm"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="email"
@@ -156,7 +156,7 @@ export default function AuthModal({ open, onClose, onAuth, mode: initialMode = '
               Password
               <input
                 type="password"
-                className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-950 px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-950 px-3 py-1.5 text-sm"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
@@ -168,7 +168,7 @@ export default function AuthModal({ open, onClose, onAuth, mode: initialMode = '
           {info && <p className="text-sm text-teal-700 dark:text-teal-300">{info}</p>}
           <button
             type="submit"
-            className="w-full rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-2.5 text-sm font-semibold hover:opacity-90"
+            className="w-full rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-2 text-sm font-semibold hover:opacity-90"
           >
             {mode === 'login' && 'Sign in'}
             {mode === 'signup' && 'Create account'}
@@ -192,10 +192,10 @@ export default function AuthModal({ open, onClose, onAuth, mode: initialMode = '
             )}
           </div>
           {mode === 'login' && (
-            <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3 mt-2">
+            <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-2.5 mt-1.5">
               <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-2">Role accounts</p>
               <div className="grid grid-cols-2 gap-2">
-                {Object.entries(ROLE_ACCOUNTS).map(([r,a]) => <button key={r} type="button" onClick={() => { setRole(r); setEmail(a.email); setPassword(a.password); }} className="text-left px-2.5 py-2 rounded-md bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 text-[11px] text-slate-600 dark:text-slate-300"><b className="block capitalize">{r}</b><span>{a.email}</span></button>)}
+                {Object.entries(ROLE_ACCOUNTS).map(([r,a]) => <button key={r} type="button" onClick={() => { setRole(r); setEmail(a.email); setPassword(a.password); }} className="text-left px-2 py-1.5 rounded-md bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 text-[11px] text-slate-600 dark:text-slate-300"><b className="block capitalize text-[10px]">{r}</b><span className="truncate block">{a.email}</span></button>)}
               </div>
             </div>
           )}
