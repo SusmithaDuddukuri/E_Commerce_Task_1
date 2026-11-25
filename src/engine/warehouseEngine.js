@@ -3003,6 +3003,7 @@ export const WAREHOUSE_BINS = [
   { binId: "BIN-02999", warehouse: "WH-12", aisle: 40, rack: 20, level: 6, sku: "SKU-00999", capacity: 59 },
 ];
 
+/** List warehouse storage bins assigned to a SKU. */
 export function binsForSku(sku) {
   return WAREHOUSE_BINS.filter((b) => b.sku === sku);
 }
