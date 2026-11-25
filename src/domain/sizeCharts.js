@@ -503,6 +503,8 @@ export const SIZE_CHARTS = [
   { id: "size-499", category: "Furniture", label: "XL", measurements: { chest: 99, waist: 79, length: 89 } },
 ];
 
+/** Retrieve size chart rows matching the specified product category. */
 export function chartForCategory(category) {
+  if (!category) return [];
   return SIZE_CHARTS.filter((s) => s.category === category);
 }
