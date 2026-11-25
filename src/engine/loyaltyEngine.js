@@ -2011,6 +2011,7 @@ export const POINTS_LEDGER_SEED = [
   { id: "pts-01999", customerId: "cust-00499", delta: 149, reason: "expire", at: "2026-02-12" },
 ];
 
+/** Sum total loyalty points recorded for a customer id. */
 export function balanceForCustomer(customerId) {
   return POINTS_LEDGER_SEED.filter((r) => r.customerId === customerId).reduce((a, r) => a + r.delta, 0);
 }
