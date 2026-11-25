@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { loadCart, saveCart, loadWishlist, saveWishlist, loadPrefs, savePrefs, loadOrders, saveOrders, loadCompare, saveCompare } from '../utils/storage';
 
+/** Persistent shopping cart state hook backed by localStorage. */
 export function useCart(initial = []) {
   const [cartItems, setCartItems] = useState(() => {
     const stored = loadCart();
