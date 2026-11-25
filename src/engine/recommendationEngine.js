@@ -1318,14 +1318,16 @@ export function cosineSimilarity(a, b) {
   return denom === 0 ? 0 : dot / denom;
 }
 
+/** Return top similar products ranked by feature vector cosine similarity. */
 export function recommendSimilar(productId, limit = 8) {
+  const safeLimit = Math.max(0, Number(limit) || 0);
   const target = PRODUCT_FEATURE_VECTORS.find((p) => p.id === productId);
   if (!target) return [];
   const scored = PRODUCT_FEATURE_VECTORS
     .filter((p) => p.id !== productId)
     .map((p) => ({ id: p.id, score: cosineSimilarity(target.vector, p.vector), categoryIndex: p.categoryIndex }))
     .sort((a, b) => b.score - a.score);
-  return scored.slice(0, limit);
+  return scored.slice(0, safeLimit);
 }
 
 export function recommendForCart(cartProductIds, limit = 6) {
