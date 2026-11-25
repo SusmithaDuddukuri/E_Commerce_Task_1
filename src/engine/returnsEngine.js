@@ -513,9 +513,11 @@ export const RETURN_WINDOWS = [
   { category: "cat_299", days: 43, restockingFeePercent: 4.50 },
 ];
 
+/** Determine whether an order falls within the category return window. */
 export function isReturnEligible(orderDateIso, category, asOf = Date.now()) {
   const window = RETURN_WINDOWS.find((w) => w.category === category) || { days: 30, restockingFeePercent: 0 };
   const ordered = new Date(orderDateIso).getTime();
+  if (Number.isNaN(ordered)) return { eligible: false, windowDays: window.days, feePercent: window.restockingFeePercent };
   const ms = window.days * 24 * 60 * 60 * 1000;
   return { eligible: asOf - ordered <= ms, windowDays: window.days, feePercent: window.restockingFeePercent };
 }
