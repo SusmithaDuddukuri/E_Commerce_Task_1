@@ -403,8 +403,10 @@ export const SUBSCRIPTION_PLANS = [
   { id: "sub-399", name: "Plan 399", intervalDays: 30, discountPercent: 14, productIds: ["aura-gen-00399"], active: true },
 ];
 
+/** Compute the next subscription billing ISO date string. */
 export function nextBillingDate(startIso, intervalDays) {
   const d = new Date(startIso);
-  d.setDate(d.getDate() + intervalDays);
+  const days = Math.max(0, Number(intervalDays) || 0);
+  d.setDate(d.getDate() + days);
   return d.toISOString();
 }
