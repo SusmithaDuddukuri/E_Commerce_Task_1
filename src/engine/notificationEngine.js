@@ -608,7 +608,7 @@ export function renderTemplate(templateId, vars = {}) {
   if (!t) return null;
   let subject = t.subject;
   let body = t.body;
-  for (const [k, v] of Object.entries(vars)) {
+  for (const [k, v] of Object.entries(vars || {})) {
     subject = subject.replaceAll(`{{${k}}}`, String(v));
     body = body.replaceAll(`{{${k}}}`, String(v));
   }
