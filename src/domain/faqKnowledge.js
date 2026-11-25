@@ -603,8 +603,9 @@ export const FAQ_ENTRIES = [
   { id: "faq-599", category: "payment", question: "Question number 599 about Aura products and orders?", answer: "Detailed answer 599 explaining policies, shipping, returns, and product care for customers." },
 ];
 
+/** Search FAQ entries matching the given keyword query. */
 export function searchFaq(query) {
-  const q = String(query || "").toLowerCase();
+  const q = String(query || "").trim().toLowerCase();
   if (!q) return FAQ_ENTRIES.slice(0, 10);
   return FAQ_ENTRIES.filter((f) => f.question.toLowerCase().includes(q) || f.answer.toLowerCase().includes(q)).slice(0, 20);
 }
