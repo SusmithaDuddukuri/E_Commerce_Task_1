@@ -549,10 +549,12 @@ export const FRAUD_RULES = [
   { id: "fraud-399", name: "Rule 399", weight: 10, field: "device", threshold: 1197 },
 ];
 
+/** Evaluate payment signals against fraud rules and classify risk level. */
 export function scoreFraud(signals = {}) {
+  const safeSignals = signals || {};
   let score = 0;
   for (const rule of FRAUD_RULES) {
-    const val = Number(signals[rule.field] || 0);
+    const val = Number(safeSignals[rule.field] || 0);
     if (val >= rule.threshold) score += rule.weight;
   }
   return { score, risk: score > 40 ? "high" : score > 15 ? "medium" : "low" };
