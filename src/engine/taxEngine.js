@@ -1203,6 +1203,7 @@ export const TAX_JURISDICTIONS = [
   { id: "tax-1199", country: "US", region: "R59", rate: 0.1125, shippingTaxable: false, digitalTaxable: false },
 ];
 
+/** Resolve tax jurisdiction configuration for a region code. */
 export function resolveJurisdiction(regionCode) {
   return TAX_JURISDICTIONS.find((j) => j.region === regionCode) || TAX_JURISDICTIONS[0];
 }
