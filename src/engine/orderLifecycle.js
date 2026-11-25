@@ -659,6 +659,7 @@ export const SLA_TABLE = [
   { lane: `lane-499`, origin: `WH-8`, destZone: `Z20`, maxHours: 91, priority: 4 },
 ];
 
+/** Look up fulfillment SLA hours for an origin warehouse and destination zone. */
 export function lookupSla(origin, destZone) {
   return SLA_TABLE.find((r) => r.origin === origin && r.destZone === destZone) || { lane: "default", maxHours: 72, priority: 0 };
 }
