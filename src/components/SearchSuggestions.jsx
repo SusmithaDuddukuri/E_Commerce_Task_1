@@ -14,7 +14,7 @@ export default function SearchSuggestions({ query, products, recent = [], onSele
         className="absolute top-[60px] left-1/2 -translate-x-1/2 w-full max-w-xl px-4"
         onClick={e => e.stopPropagation()}
       >
-        <div className="glass-panel rounded-2xl border border-slate-700 shadow-2xl overflow-hidden">
+        <div role="dialog" aria-label="Search suggestions" className="glass-panel rounded-2xl border border-slate-700 shadow-2xl overflow-hidden">
           {recent.length > 0 && !query && (
             <div className="p-3 border-b border-slate-200 dark:border-slate-800">
               <p className="text-[10px] uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1">
