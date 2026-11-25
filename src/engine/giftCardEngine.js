@@ -1005,7 +1005,9 @@ export const GIFT_CARD_SEED = [
   { code: "GC-00000999", balance: 200, currency: "USD", active: true, expiresAt: "2027-04-20" },
 ];
 
+/** Validate and redeem a gift card balance for a purchase amount. */
 export function redeemGiftCard(code, amount) {
+  if (!Number.isFinite(Number(amount)) || Number(amount) <= 0) return { ok: false, reason: "invalid_amount" };
   const card = GIFT_CARD_SEED.find((c) => c.code === code && c.active);
   if (!card) return { ok: false, reason: "invalid" };
   if (card.balance < amount) return { ok: false, reason: "insufficient" };
