@@ -803,6 +803,9 @@ export const SUPPLIERS = [
   { id: "SUPP-0799", name: "Supplier 799", country: "IT", leadDays: 24, rating: 3.9, active: true },
 ];
 
+/** List active suppliers located in the given country code. */
 export function suppliersByCountry(country) {
-  return SUPPLIERS.filter((s) => s.country === country && s.active);
+  const code = String(country || "").trim().toUpperCase();
+  if (!code) return [];
+  return SUPPLIERS.filter((s) => s.country === code && s.active);
 }
