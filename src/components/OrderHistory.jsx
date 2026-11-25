@@ -14,7 +14,7 @@ export default function OrderHistory({ isOpen, onClose, orders = [] }) {
             <Package className="w-5 h-5 text-indigo-400" />
             <h2 className="font-bold text-slate-900 dark:text-white">Order History</h2>
           </div>
-          <button type="button" onClick={onClose} className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+          <button type="button" aria-label="Close order history" onClick={onClose} className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
             <X className="w-5 h-5" />
           </button>
         </div>
