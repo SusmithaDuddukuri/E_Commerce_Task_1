@@ -1003,6 +1003,7 @@ export const PO_TEMPLATES = [
   { id: "PO-00999", supplierId: "SUPP-0199", sku: "SKU-00999", qty: 109, unitCost: 32.50, status: "received" },
 ];
 
+/** Return all purchase order templates that have not been marked received. */
 export function openPurchaseOrders() {
   return PO_TEMPLATES.filter((p) => p.status !== "received");
 }
