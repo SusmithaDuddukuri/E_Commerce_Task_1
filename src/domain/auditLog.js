@@ -503,6 +503,7 @@ export const AUDIT_ACTIONS = [
   { id: "audit-499", action: "action_499", resource: "settings", severity: "warn" },
 ];
 
+/** Create a timestamped audit log record for a domain action. */
 export function buildAuditEntry(action, actor, resourceId, meta = {}) {
-  return { id: `ae_${Date.now()}`, action, actor, resourceId, meta, at: new Date().toISOString() };
+  return { id: `ae_${Date.now()}`, action, actor, resourceId, meta: meta || {}, at: new Date().toISOString() };
 }
