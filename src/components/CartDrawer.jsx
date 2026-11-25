@@ -54,6 +54,7 @@ export default function CartDrawer({
             </div>
 
             <button type="button"
+              aria-label="Close shopping bag"
               onClick={onClose}
               className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors"
             >
