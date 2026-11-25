@@ -1550,6 +1550,7 @@ export const MODERATION_BLOCKLIST = [
   "blocked_phrase_499",
 ];
 
+/** Validate customer review text against length and blocklist rules. */
 export function moderateReview(comment) {
   const lower = String(comment || "").toLowerCase();
   for (const phrase of MODERATION_BLOCKLIST) {
