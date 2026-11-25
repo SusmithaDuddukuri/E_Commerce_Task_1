@@ -656,6 +656,7 @@ export const SEARCH_SYNONYMS = {
   "term_599": ["syn_599_a", "syn_599_b", "syn_599_c"],
 };
 
+/** Tokenize a search query and expand each token with configured synonyms. */
 export function expandQuery(query) {
   const tokens = tokenize(query);
   const expanded = new Set(tokens);
