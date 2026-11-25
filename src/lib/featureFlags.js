@@ -403,6 +403,7 @@ export const FEATURE_FLAGS = [
   { key: "flag_399", description: "Feature flag 399", defaultValue: false, envOverrides: {} },
 ];
 
+/** Evaluate whether a feature flag is enabled with optional environment overrides. */
 export function isEnabled(key, env = {}) {
   const flag = FEATURE_FLAGS.find((f) => f.key === key);
   if (!flag) return false;
