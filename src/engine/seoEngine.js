@@ -3006,6 +3006,7 @@ export const SLUG_MAP = [
   { productId: "aura-gen-02499", slug: "aura-product-02499", canonical: "/p/aura-product-02499" },
 ];
 
+/** Look up the canonical URL slug for a product id. */
 export function slugForProduct(productId) {
   const row = SLUG_MAP.find((s) => s.productId === productId);
   return row ? row.slug : null;
