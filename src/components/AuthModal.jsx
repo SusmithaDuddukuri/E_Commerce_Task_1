@@ -104,7 +104,7 @@ export default function AuthModal({ open, onClose, onAuth, mode: initialMode = '
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4">
       <div className="absolute inset-0 bg-slate-900/50" onClick={onClose} />
-      <div className="relative w-full max-w-sm max-h-[calc(100vh-1.5rem)] sm:max-h-[calc(100vh-2rem)] overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl">
+      <div role="dialog" aria-modal="true" aria-label="Authentication" className="relative w-full max-w-sm max-h-[calc(100vh-1.5rem)] sm:max-h-[calc(100vh-2rem)] overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl">
         <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700">
           <h2 className="font-semibold text-slate-900 dark:text-white">
             {mode === 'login' && 'Sign in'}
