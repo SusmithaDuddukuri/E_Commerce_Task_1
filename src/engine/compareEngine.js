@@ -1566,7 +1566,9 @@ export const COMPARE_MATRIX = [
   { productId: "aura-gen-01499", values: [7, 6, 5, 4, 3, 2, 1, 0, 99, 98] },
 ];
 
+/** Build comparison attributes and matrix rows for selected product ids. */
 export function compareProducts(ids) {
-  const rows = COMPARE_MATRIX.filter((r) => ids.includes(r.productId));
+  const list = Array.isArray(ids) ? ids : [];
+  const rows = COMPARE_MATRIX.filter((r) => list.includes(r.productId));
   return { attributes: COMPARE_ATTRIBUTES.slice(0, 10), rows };
 }
