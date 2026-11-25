@@ -813,6 +813,8 @@ export function createSession(userId = null) {
   };
 }
 
+/** Update session activity timestamp and increment page view count. */
 export function touchSession(session) {
-  return { ...session, lastSeenAt: Date.now(), pageViews: (session.pageViews || 0) + 1 };
+  const base = session || createSession();
+  return { ...base, lastSeenAt: Date.now(), pageViews: (base.pageViews || 0) + 1 };
 }
