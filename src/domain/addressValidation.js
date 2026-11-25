@@ -303,6 +303,7 @@ export const ADDRESS_RULES = [
   { country: "C299", requireState: false, requireZip: true, zipPattern: "^[0-9]{6}$", maxAddressLen: 99 },
 ];
 
+/** Validate shipping address fields against country rules. */
 export function validateAddress(addr, country) {
   const rule = ADDRESS_RULES.find((r) => r.country === country) || ADDRESS_RULES[0];
   const errors = {};
