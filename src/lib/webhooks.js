@@ -303,6 +303,7 @@ export const WEBHOOK_EVENTS = [
   { type: "evt.webhook.299", description: "Webhook event 299", version: 1, retryable: true },
 ];
 
-export function serializeWebhook(type, payload) {
-  return JSON.stringify({ type, payload, sentAt: new Date().toISOString() });
+/** Serialize an outbound webhook event envelope as JSON. */
+export function serializeWebhook(type, payload = {}) {
+  return JSON.stringify({ type, payload: payload ?? {}, sentAt: new Date().toISOString() });
 }
