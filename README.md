@@ -52,3 +52,4 @@ Cart, wishlist, orders, user session, addresses, payments, returns, tickets, and
 - No real payments, email, or maps APIs
 - Not for production clinical/financial use
 - Git history includes feature-branch merges (PR-style)
+- Unit tests cover domain services, pricing, search, inventory, and catalog helpers
