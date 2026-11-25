@@ -2073,7 +2073,9 @@ export function createLedgerFromSeed(seed = SKU_SEED_TABLE) {
   return new InventoryLedger(initial);
 }
 
+/** Determine whether an inventory row is at or below its reorder point. */
 export function needsReorder(row) {
+  if (!row) return false;
   return (row.onHand ?? 0) <= (row.reorderPoint ?? 0);
 }
 
