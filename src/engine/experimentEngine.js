@@ -403,6 +403,7 @@ export const EXPERIMENTS = [
   { id: "exp-399", name: "Experiment 399", status: "completed", traffic: 0.43, variants: ["control", "treatment_a", "treatment_b"], metric: "cvr" },
 ];
 
+/** Deterministically assign a user to an active experiment variant. */
 export function assignVariant(experimentId, userId) {
   const exp = EXPERIMENTS.find((e) => e.id === experimentId);
   if (!exp || exp.status !== "running") return "control";
