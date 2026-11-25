@@ -158,9 +158,11 @@ export const FUNNEL_DEFINITIONS = [
   { id: `funnel-099`, name: `Funnel 99`, steps: ['page_view', 'product_view', 'add_to_cart', 'remove_from_cart'] },
 ];
 
+/** Count analytics events grouped by event type. */
 export function aggregateByType(events) {
   const map = {};
   for (const e of events || []) {
+    if (!e || !e.type) continue;
     map[e.type] = (map[e.type] || 0) + 1;
   }
   return map;
