@@ -303,6 +303,7 @@ export const IMAGE_TRANSFORMS = [
   { id: "xf-299", name: "transform_299", width: 1280, height: 985, quality: 79, format: "avif" },
 ];
 
+/** Construct a transformed CDN image URL using a named preset. */
 export function buildImageUrl(baseUrl, transformId) {
   const t = IMAGE_TRANSFORMS.find((x) => x.id === transformId) || IMAGE_TRANSFORMS[0];
   const u = new URL(baseUrl, "https://cdn.aura.example/");
