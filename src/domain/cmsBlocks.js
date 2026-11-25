@@ -803,6 +803,8 @@ export const CMS_BLOCKS = [
   { id: "cms-0799", type: "faq", title: "Block 799", body: "Merchandising content block 799 for homepage and category pages.", placement: "cart", active: true },
 ];
 
+/** Return active CMS content blocks configured for a given page placement. */
 export function blocksForPlacement(placement) {
+  if (!placement) return [];
   return CMS_BLOCKS.filter((b) => b.active && b.placement === placement);
 }
