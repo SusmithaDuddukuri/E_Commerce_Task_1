@@ -603,7 +603,10 @@ export const BUNDLES = [
   { id: "bundle-599", name: "Bundle 599", productIds: ["aura-gen-00599", "aura-gen-00600", "aura-gen-00601"], discountPercent: 24, active: true },
 ];
 
-export function bundlePrice(bundle, priceLookup) {
-  const sum = (bundle.productIds || []).reduce((a, id) => a + (priceLookup[id] || 0), 0);
+/** Compute the discounted total price for a product bundle. */
+export function bundlePrice(bundle, priceLookup = {}) {
+  if (!bundle) return 0;
+  const prices = priceLookup || {};
+  const sum = (bundle.productIds || []).reduce((a, id) => a + (prices[id] || 0), 0);
   return Math.round(sum * (1 - (bundle.discountPercent || 0) / 100) * 100) / 100;
 }
