@@ -54,13 +54,14 @@ export function isNonEmpty(str, min = 1) {
 }
 
 export function validateShipping(form) {
+  const data = form || {};
   const errors = {};
-  if (!isNonEmpty(form.firstName, 2)) errors.firstName = 'First name required';
-  if (!isNonEmpty(form.lastName, 2)) errors.lastName = 'Last name required';
-  if (!isValidEmail(form.email)) errors.email = 'Valid email required';
-  if (!isNonEmpty(form.address, 5)) errors.address = 'Street address required';
-  if (!isNonEmpty(form.city, 2)) errors.city = 'City required';
-  if (!isValidZip(form.zip)) errors.zip = 'Valid ZIP required';
+  if (!isNonEmpty(data.firstName, 2)) errors.firstName = 'First name required';
+  if (!isNonEmpty(data.lastName, 2)) errors.lastName = 'Last name required';
+  if (!isValidEmail(data.email)) errors.email = 'Valid email required';
+  if (!isNonEmpty(data.address, 5)) errors.address = 'Street address required';
+  if (!isNonEmpty(data.city, 2)) errors.city = 'City required';
+  if (!isValidZip(data.zip)) errors.zip = 'Valid ZIP required';
   return errors;
 }
 
