@@ -31,10 +31,12 @@ function safeParse(raw, fallback) {
 }
 
 function load(key, fallback) {
+  if (typeof localStorage === 'undefined') return fallback;
   return safeParse(localStorage.getItem(key), fallback);
 }
 
 function save(key, value) {
+  if (typeof localStorage === 'undefined') return;
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch (e) {
