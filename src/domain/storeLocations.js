@@ -403,9 +403,11 @@ export const STORE_LOCATIONS = [
   { id: "store-399", name: "Aura Store 399", city: "City399", country: "FR", lat: 34.9000, lng: -112.2000, open: true },
 ];
 
+/** Return stores ordered by Euclidean distance from the given coordinates. */
 export function nearestStores(lat, lng, limit = 5) {
+  const safeLimit = Math.max(0, Number(limit) || 0);
   return [...STORE_LOCATIONS]
     .map((s) => ({ ...s, dist: Math.hypot(s.lat - lat, s.lng - lng) }))
     .sort((a, b) => a.dist - b.dist)
-    .slice(0, limit);
+    .slice(0, safeLimit);
 }
