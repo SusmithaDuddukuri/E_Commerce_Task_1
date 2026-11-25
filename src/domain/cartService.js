@@ -252,10 +252,11 @@ export const CART_VALIDATION_RULES = [
   { id: `rule-199`, name: `Validation rule 199`, severity: 'warn', check: "quantity_positive" },
 ];
 
+/** Validate cart line items for positive quantities stock limits and valid prices. */
 export function validateCart(cart) {
   const errors = [];
   const warnings = [];
-  for (const item of cart.items || []) {
+  for (const item of (cart && cart.items) || []) {
     if (!item.quantity || item.quantity < 1) errors.push({ sku: item.id, message: "Invalid quantity" });
     if (item.quantity > (item.maxStock || 99)) errors.push({ sku: item.id, message: "Exceeds stock" });
     if (item.price == null || item.price < 0) errors.push({ sku: item.id, message: "Invalid price" });
