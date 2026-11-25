@@ -803,6 +803,7 @@ export const CAMPAIGNS = [
   { id: "camp-0799", name: "Campaign 799", start: "2026-01-01", end: "2026-12-31", budget: 40950, channel: "ads", active: true, targetSegment: "seg-199" },
 ];
 
+/** Return campaigns active on the given ISO date. */
 export function activeCampaigns(asOf = "2026-08-29") {
   return CAMPAIGNS.filter((c) => c.active && c.start <= asOf && c.end >= asOf);
 }
