@@ -1511,6 +1511,8 @@ export function customersByTier(tier) {
   return CUSTOMER_SEED.filter((c) => c.tier === tier);
 }
 
+/** Return the top customers sorted by lifetime value. */
 export function topCustomersByLtv(limit = 20) {
-  return [...CUSTOMER_SEED].sort((a, b) => b.lifetimeValue - a.lifetimeValue).slice(0, limit);
+  const safeLimit = Math.max(0, Number(limit) || 0);
+  return [...CUSTOMER_SEED].sort((a, b) => b.lifetimeValue - a.lifetimeValue).slice(0, safeLimit);
 }
