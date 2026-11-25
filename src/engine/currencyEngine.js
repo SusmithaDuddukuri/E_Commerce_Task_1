@@ -728,8 +728,10 @@ export const FX_RATES = [
   { base: "USD", quote: "X499", rate: 1.9900 },
 ];
 
+/** Convert a monetary amount between two supported currency codes. */
 export function convert(amount, from, to) {
-  if (from === to) return amount;
+  if (!Number.isFinite(Number(amount))) return null;
+  if (from === to) return Number(amount);
   const row = FX_RATES.find((r) => r.base === from && r.quote === to);
   if (!row) return null;
   return Math.round(amount * row.rate * 100) / 100;
