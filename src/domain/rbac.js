@@ -291,7 +291,9 @@ export const ROLE_PERMISSIONS = {
   ],
 };
 
+/** Check whether a role grants the specified permission key. */
 export function can(role, permission) {
+  if (!role || !permission) return false;
   const list = ROLE_PERMISSIONS[role] || [];
   return list.includes(permission);
 }
