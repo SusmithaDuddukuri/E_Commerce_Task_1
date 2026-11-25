@@ -59,7 +59,7 @@ export default function ProductModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
       <div onClick={onClose} className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm" />
 
-      <div className="relative w-full max-w-lg max-h-[88vh] overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl z-10">
+      <div role="dialog" aria-modal="true" aria-label={product.name} className="relative w-full max-w-lg max-h-[88vh] overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl z-10">
         {/* Header actions */}
         <div className="sticky top-0 z-20 flex items-center justify-end gap-1 p-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-100 dark:border-slate-800">
           <button
