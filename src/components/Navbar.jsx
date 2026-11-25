@@ -29,7 +29,7 @@ export default function Navbar({
         <nav className="hidden lg:flex items-center gap-1 ml-3">
           <button type="button" onClick={() => go('storefront')} className={`nav-link ${currentView === 'storefront' ? 'nav-link-active' : ''}`}>Home</button>
           <div className="relative" ref={ref}>
-            <button type="button" onClick={() => setShopOpen(v => !v)} className="nav-link inline-flex items-center gap-1">
+            <button type="button" aria-expanded={shopOpen} onClick={() => setShopOpen(v => !v)} className="nav-link inline-flex items-center gap-1">
               Products <ChevronDown className={`w-3.5 h-3.5 transition-transform ${shopOpen ? 'rotate-180' : ''}`} />
             </button>
             {shopOpen && (
