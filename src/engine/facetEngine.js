@@ -2116,9 +2116,11 @@ export const PRODUCT_FACETS = [
   { productId: "aura-gen-01999", color: "White", material: "Plastic", price_band: "luxury", rating_band: "4star", origin: "CH", warranty: "24m", eco_rating: "B" },
 ];
 
+/** Filter indexed product facet rows using selected facet criteria. */
 export function filterByFacets(selected = {}) {
+  const criteria = selected || {};
   return PRODUCT_FACETS.filter((row) => {
-    for (const [k, vals] of Object.entries(selected)) {
+    for (const [k, vals] of Object.entries(criteria)) {
       if (!vals || !vals.length) continue;
       if (!vals.includes(row[k])) return false;
     }
