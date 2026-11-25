@@ -17,7 +17,7 @@ export function formatPrice(amount, currency = 'USD') {
 }
 
 export function formatPercent(value, digits = 0) {
-  if (value == null) return '0%';
+  if (value == null || !Number.isFinite(Number(value))) return '0%';
   return `${Number(value).toFixed(digits)}%`;
 }
 
