@@ -22,7 +22,7 @@ export default function CompareBar({ compareIds, products, onClear, onRemove, on
                 <p className="text-[11px] text-slate-900 dark:text-white truncate font-medium">{p.name}</p>
                 <p className="text-[10px] text-slate-500 dark:text-slate-400">{formatPrice(p.price)}</p>
               </div>
-              <button type="button" onClick={() => onRemove(p.id)} className="p-1 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white">
+              <button type="button" aria-label={`Remove ${p.name} from compare`} onClick={() => onRemove(p.id)} className="p-1 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white">
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
