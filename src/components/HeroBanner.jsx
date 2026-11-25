@@ -95,6 +95,7 @@ export default function HeroBanner({ onExplore, featuredProduct, onQuickView, on
                       onClick={() => onAddToCart(featuredProduct)}
                       className="w-11 h-11 rounded-xl bg-white text-slate-900 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform shadow-lg shrink-0"
                       title="Add to cart"
+                      aria-label="Add featured product to cart"
                     >
                       <ShoppingBag className="w-4 h-4" />
                     </button>
