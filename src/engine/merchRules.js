@@ -1503,6 +1503,7 @@ export const BOOST_RULES = [
   { id: "boost-1499", productId: "aura-gen-00699", score: 69, reason: "campaign", active: true },
 ];
 
+/** Score and rank candidate product ids using active merchandising boosts. */
 export function applyBoosts(productIds) {
   const map = new Map();
   for (const id of productIds || []) map.set(id, 0);
