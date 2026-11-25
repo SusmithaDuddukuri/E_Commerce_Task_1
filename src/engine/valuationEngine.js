@@ -2011,9 +2011,10 @@ export function weightedAverageCost(sku) {
   return qty ? cost / qty : 0;
 }
 
+/** Calculate first in first out inventory cost for a requested SKU quantity. */
 export function fifoCost(sku, qtyNeeded) {
   const layers = COST_LAYERS.filter((l) => l.sku === sku).sort((a, b) => a.receivedAt.localeCompare(b.receivedAt));
-  let remaining = qtyNeeded;
+  let remaining = Math.max(0, Number(qtyNeeded) || 0);
   let total = 0;
   for (const l of layers) {
     if (remaining <= 0) break;
