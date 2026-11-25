@@ -203,7 +203,9 @@ export const RATE_LIMITS = [
   { route: "/api/route_199", windowMs: 60000, max: 129 },
 ];
 
+/** Check whether current route traffic remains under the configured rate limit. */
 export function checkRateLimit(route, hits) {
+  const count = Math.max(0, Number(hits) || 0);
   const policy = RATE_LIMITS.find((r) => r.route === route) || { max: 100 };
-  return { allowed: hits < policy.max, remaining: Math.max(0, policy.max - hits) };
+  return { allowed: count < policy.max, remaining: Math.max(0, policy.max - count) };
 }
