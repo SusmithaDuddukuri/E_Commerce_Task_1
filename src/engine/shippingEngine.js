@@ -2256,7 +2256,9 @@ export const RATE_CARDS = [
   { id: "RC-1999", zone: "Z199", weightMin: 19, weightMax: 24, price: 53.75, carrier: "carrier-79", service: "express" },
 ];
 
+/** Quote the lowest shipping rate card for a zone weight and service tier. */
 export function quoteShipping(zoneId, weightKg, service = "standard") {
+  if (!Number.isFinite(Number(weightKg)) || Number(weightKg) < 0) return { ok: false, price: null };
   const rows = RATE_CARDS.filter((r) => r.zone === zoneId && r.service === service && weightKg >= r.weightMin && weightKg < r.weightMax);
   if (!rows.length) return { ok: false, price: null };
   rows.sort((a, b) => a.price - b.price);
