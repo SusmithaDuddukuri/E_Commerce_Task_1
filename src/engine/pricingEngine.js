@@ -591,6 +591,7 @@ export const VOLUME_DISCOUNT_TABLE = [
   { minQty: 199, maxQty: 200, percentOff: 39.60 },
 ];
 
+/** Look up the percentage discount for a given item quantity tier. */
 export function volumeDiscountPercent(qty) {
   const row = VOLUME_DISCOUNT_TABLE.find((r) => qty >= r.minQty && qty <= r.maxQty);
   return row ? row.percentOff : 0;
